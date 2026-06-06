@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Publicize Include="Assembly-CSharp;0Harmony" />
   </ItemGroup>
 
