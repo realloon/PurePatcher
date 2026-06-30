@@ -17,16 +17,16 @@ internal class PurePatcherMod : Mod {
 
         if (DataStore.StartedOnce) {
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (_, args) => {
-                Lg.Verbose($"ReflectionOnlyAssemblyResolve: {args.RequestingAssembly} requested {args.Name}");
+                Logger.Verbose($"ReflectionOnlyAssemblyResolve: {args.RequestingAssembly} requested {args.Name}");
                 return null;
             };
 
-            Lg.Info($"Restarted with the patched assembly, going silent.");
+            Logger.Info($"Restarted with the patched assembly, going silent.");
             return;
         }
 
         DataStore.StartedOnce = true;
-        Lg.Info($"Starting... (vanilla load took {Time.realtimeSinceStartup}s)");
+        Logger.Info($"Starting... (vanilla load took {Time.realtimeSinceStartup}s)");
 
         Patches.HarmonyPatches.SilenceLogging();
         Loader.Reload();
@@ -38,14 +38,13 @@ internal class PurePatcherMod : Mod {
     }
 
     private static void InitLg() {
-        Lg.InfoFunc = msg => Log.Message($"PurePatcher: {msg}");
-        Lg.ErrorFunc = msg => Log.Error($"PurePatcher Error: {msg}");
+        Logger.InfoFunc = msg => Log.Message($"PurePatcher: {msg}");
+        Logger.ErrorFunc = msg => Log.Error($"PurePatcher Error: {msg}");
 
-        if (GenCommandLine.CommandLineArgPassed(CmdArgVerbose))
-            Lg.VerboseFunc = msg => Log.Message($"PurePatcher Verbose: {msg}");
+        if (GenCommandLine.CommandLineArgPassed(CmdArgVerbose)) {
+            Logger.VerboseFunc = msg => Log.Message($"PurePatcher Verbose: {msg}");
+        }
     }
 
-    public override string SettingsCategory() {
-        return "PurePatcher";
-    }
+    public override string SettingsCategory() => "PurePatcher";
 }

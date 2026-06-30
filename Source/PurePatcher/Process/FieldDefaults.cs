@@ -10,7 +10,7 @@ namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
     private void PatchCtorsWithDefault(FieldDefinition newField, CustomAttribute attribute) {
-        Lg.Verbose("Patching the ctors with field constant default");
+        Logger.Verbose("Patching the ctors with field constant default");
 
         var defaultValueObj = attribute.ConstructorArguments.First().Value;
         var defaultValue = defaultValueObj is CustomAttributeArgument arg ? arg.Value : defaultValueObj;
@@ -37,7 +37,7 @@ internal partial class FieldAdder {
 
     private void PatchCtorsWithInitializer(MethodDefinition accessor, FieldDefinition newField,
         CustomAttribute attribute) {
-        Lg.Verbose("Patching the ctors with field initializer");
+        Logger.Verbose("Patching the ctors with field initializer");
 
         var initializerMethodName = (string)attribute.ConstructorArguments.First().Value;
         var initializer = accessor.DeclaringType.FindMethod(initializerMethodName);

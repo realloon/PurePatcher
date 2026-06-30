@@ -41,7 +41,7 @@ internal partial class FieldAdder {
     }
 
     private void PatchInjectionSite(MethodDefinition accessor, FieldDefinition newField) {
-        Lg.Verbose("Patching the component initialization site for injection");
+        Logger.Verbose("Patching the component initialization site for injection");
 
         // ldtoken newfield
         // ldarg 0

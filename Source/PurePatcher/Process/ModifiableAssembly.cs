@@ -47,19 +47,19 @@ public class ModifiableAssembly {
 
     public void SerializeToByteArray() {
         if (RawBytes != null && !Modified) {
-            Lg.Verbose($"Assembly not modified, skipping serialization: {FriendlyName}");
+            Logger.Verbose($"Assembly not modified, skipping serialization: {FriendlyName}");
             Bytes = RawBytes;
             return;
         }
 
-        Lg.Verbose($"Serializing: {FriendlyName}");
+        Logger.Verbose($"Serializing: {FriendlyName}");
         var stream = new MemoryStream();
         AsmDefinition.Write(stream);
         Bytes = stream.ToArray();
     }
 
     public void SetSourceRefOnly() {
-        Lg.Verbose($"Setting refonly: {FriendlyName}");
+        Logger.Verbose($"Setting refonly: {FriendlyName}");
         UnsafeAssembly.SetReflectionOnly(SourceAssembly!, true);
     }
 

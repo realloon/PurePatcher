@@ -27,7 +27,7 @@ internal partial class FieldAdder(AssemblySet set) {
     internal void ProcessAccessor(MethodDefinition accessor) {
         if (CheckFieldAccessor(accessor) is { } error) {
             var accessorAsm = set.FindAssembly(accessor.DeclaringType);
-            Lg.Error($"{accessorAsm}: {error} for new field with accessor {accessor.MemberFullName()}");
+            Logger.Error($"{accessorAsm}: {error} for new field with accessor {accessor.MemberFullName()}");
             return;
         }
 
@@ -48,7 +48,7 @@ internal partial class FieldAdder(AssemblySet set) {
         var targetType = FirstParameterTypeResolved(accessor)!;
         var fieldType = ImportFieldTypeIntoTargetModule(accessor);
 
-        Lg.Verbose($"Adding new field {FieldName(accessor)} of type {fieldType} to type {targetType}");
+        Logger.Verbose($"Adding new field {FieldName(accessor)} of type {fieldType} to type {targetType}");
 
         var ceField = new FieldDefinition(
             FieldName(accessor),
@@ -66,7 +66,7 @@ internal partial class FieldAdder(AssemblySet set) {
     }
 
     private void PatchAccessor(MethodDefinition accessor, FieldDefinition newField) {
-        Lg.Verbose("Patching the accessor");
+        Logger.Verbose("Patching the accessor");
 
         accessor.ImplAttributes &= ~MethodImplAttributes.InternalCall; // Unextern
 

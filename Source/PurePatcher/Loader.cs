@@ -16,17 +16,17 @@ internal static class Loader {
 
     internal static void Reload() {
         try {
-            Lg.Verbose("Reloading the game");
+            Logger.Verbose("Reloading the game");
             DoReload();
 
             if (GenCommandLine.CommandLineArgPassed("patchandexit")) {
                 Application.Quit();
             }
 
-            Lg.Info("Done loading");
+            Logger.Info("Done loading");
             RestartGame = true;
         } catch (Exception e) {
-            Lg.Error($"Fatal error while reloading: {e}");
+            Logger.Error($"Fatal error while reloading: {e}");
             throw;
         }
     }
@@ -75,7 +75,7 @@ internal static class Loader {
     }
 
     private static void LoadAssembly(ModifiableAssembly asm) {
-        Lg.Verbose($"Loading assembly: {asm}");
+        Logger.Verbose($"Loading assembly: {asm}");
 
         var loadedAssembly = Assembly.Load(asm.Bytes);
         if (loadedAssembly.GetName().Name == AssemblyCollector.AssemblyCSharp) {
@@ -93,7 +93,7 @@ internal static class Loader {
     }
 
     private static void UnregisterWorkshopCallbacks() {
-        Lg.Verbose("Unregistering workshop callbacks");
+        Logger.Verbose("Unregistering workshop callbacks");
 
         // These hold references to old code and would get called externally by Steam
         Workshop.subscribedCallback?.Unregister();
@@ -102,7 +102,7 @@ internal static class Loader {
     }
 
     private static void ClearAssemblyResolve() {
-        Lg.Verbose("Clearing AppDomain.AssemblyResolve");
+        Logger.Verbose("Clearing AppDomain.AssemblyResolve");
 
         var asmResolve = AccessTools.Field(typeof(AppDomain), "AssemblyResolve");
         var del = (Delegate)asmResolve.GetValue(AppDomain.CurrentDomain);

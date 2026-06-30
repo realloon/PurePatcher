@@ -1,6 +1,6 @@
 namespace PurePatcher;
 
-internal static class Lg {
+internal static class Logger {
     internal static Action<object>? InfoFunc;
     internal static Action<object>? ErrorFunc;
     internal static Action<object>? VerboseFunc;

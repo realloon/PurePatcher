@@ -9,7 +9,7 @@ internal class StopwatchScope : IDisposable {
     private StopwatchScope() { }
 
     public void Dispose() {
-        Lg.Info($"{title} took {watch.Elapsed.TotalMilliseconds}ms");
+        Logger.Info($"{title} took {watch.Elapsed.TotalMilliseconds}ms");
     }
 
     internal static StopwatchScope Measure(string title) => new() {

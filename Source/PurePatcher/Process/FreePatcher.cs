@@ -12,7 +12,7 @@ namespace PurePatcher.Process;
 internal static class FreePatcher {
     internal static void RunPatches(AssemblySet assemblySet, string mainAssemblyName,
         Action<ModifiableAssembly>? callback = null) {
-        Lg.Verbose("Running free patches");
+        Logger.Verbose("Running free patches");
 
         var patcherAssemblies = assemblySet.AllAssemblies
             .Where(a => a.ProcessAttributes && a.SourceAssembly != null);
@@ -25,7 +25,7 @@ internal static class FreePatcher {
         foreach (var modifiableAssembly in patcherAssemblies)
         foreach (var patcher in FindAllFreePatches(modifiableAssembly.SourceAssembly!)) {
             callback?.Invoke(modifiableAssembly);
-            Lg.Verbose($"Running free patch: {patcher.FullDescription()}");
+            Logger.Verbose($"Running free patch: {patcher.FullDescription()}");
 
             if (IsDefinedSafe<FreePatchAttribute>(patcher)) {
                 if (InvokePatcher(patcher, mainAssembly.ModuleDefinition)) {
@@ -46,7 +46,7 @@ internal static class FreePatcher {
             var ret = patcher.Invoke(null, [moduleToPatch]);
             return ret == null || (bool)ret;
         } catch (Exception e) {
-            Lg.Error($"Exception running free patch {patcher.FullDescription()}: {e}");
+            Logger.Error($"Exception running free patch {patcher.FullDescription()}: {e}");
             return false;
         }
     }

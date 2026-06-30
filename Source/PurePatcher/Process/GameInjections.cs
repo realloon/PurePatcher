@@ -5,7 +5,7 @@ namespace PurePatcher.Process;
 
 internal static class GameInjections {
     internal static void RegisterInjections(FieldAdder fieldAdder) {
-        Lg.Verbose("Registering injections");
+        Logger.Verbose("Registering injections");
 
         fieldAdder.RegisterInjection(
             typeof(ThingWithComps),

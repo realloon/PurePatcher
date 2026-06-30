@@ -15,7 +15,7 @@ internal static class Reloader {
         beforeSerialization?.Invoke();
 
         // Serializing and loading is split to do as little as possible after refonlys are set
-        Lg.Info("Serializing patched assemblies");
+        Logger.Info("Serializing patched assemblies");
         using (StopwatchScope.Measure("Serializing")) {
             foreach (var toReload in set.AllAssemblies.Where(modAssembly => modAssembly.NeedsReload)) {
                 toReload.SerializeToByteArray();
@@ -24,7 +24,7 @@ internal static class Reloader {
 
         beforeRefOnlys?.Invoke();
 
-        Lg.Info("Setting refonly");
+        Logger.Info("Setting refonly");
         foreach (var toSet in SetRefonly) {
             UnsafeAssembly.SetReflectionOnly(toSet, true);
         }
@@ -33,7 +33,7 @@ internal static class Reloader {
             toReload.SetSourceRefOnly();
         }
 
-        Lg.Info("Loading patched assemblies");
+        Logger.Info("Loading patched assemblies");
         foreach (var toReload in set.AllAssemblies.Where(modAssembly => modAssembly.NeedsReload)) {
             loadAssemblyAction(toReload);
         }

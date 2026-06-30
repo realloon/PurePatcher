@@ -9,7 +9,7 @@ namespace PurePatcher.Patches;
 
 internal static partial class HarmonyPatches {
     internal static void PatchRootMethods() {
-        Lg.Verbose("Patching Root methods");
+        Logger.Verbose("Patching Root methods");
 
         harmony.Patch(
             Loader.origAsm.GetType("Verse.Root_Play").GetMethod("Start"),
@@ -55,7 +55,7 @@ internal static partial class HarmonyPatches {
     }
 
     private static void RecreateComponents() {
-        Lg.Verbose("Recreating comps");
+        Logger.Verbose("Recreating comps");
 
         // It's important the components are iterated this way to make sure
         // they are recreated in the correct order.
@@ -69,10 +69,10 @@ internal static partial class HarmonyPatches {
                 var newComp = comp.gameObject.AddComponent(translation);
                 UnityEngine.Object.Destroy(comp);
 
-                Lg.Verbose(
+                Logger.Verbose(
                     $"Recreated {comp} {newComp.GetType().Assembly == Loader.newAsm} with new type {translation.FullName}");
             } catch (Exception e) {
-                Lg.Error($"Exception recreating Unity component {comp}: {e}");
+                Logger.Error($"Exception recreating Unity component {comp}: {e}");
             }
         }
     }

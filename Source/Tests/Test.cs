@@ -15,8 +15,8 @@ internal class Test {
     protected ModifiableAssembly TestAsm = null!;
 
     public virtual void Setup() {
-        Lg.InfoFunc = Console.WriteLine;
-        Lg.ErrorFunc = msg => {
+        Logger.InfoFunc = Console.WriteLine;
+        Logger.ErrorFunc = msg => {
             Console.WriteLine(msg);
             throw new LogErrorException($"{msg}");
         };

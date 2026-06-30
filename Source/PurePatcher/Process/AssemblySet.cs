@@ -16,7 +16,7 @@ public class AssemblySet {
     }
 
     public ModifiableAssembly AddAssembly(string ownerName, string friendlyName, string? asmFilePath, Assembly? asm) {
-        Lg.Verbose($"Adding assembly {friendlyName}");
+        Logger.Verbose($"Adding assembly {friendlyName}");
 
         var masm = asmFilePath != null
             ? new ModifiableAssembly(ownerName, friendlyName, asmFilePath, Resolver)
