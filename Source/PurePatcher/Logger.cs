@@ -1,11 +1,11 @@
 namespace PurePatcher;
 
 internal static class Logger {
-    internal static Action<object>? InfoFunc;
-    internal static Action<object>? ErrorFunc;
-    internal static Action<object>? VerboseFunc;
+    internal static Action<string>? InfoFunc;
+    internal static Action<string>? ErrorFunc;
+    internal static Action<string>? VerboseFunc;
 
-    internal static void Info(object msg) => InfoFunc?.Invoke(msg);
+    internal static void Info(string msg) => InfoFunc?.Invoke(msg);
 
     internal static void Error(string msg) => ErrorFunc?.Invoke(msg);
 
