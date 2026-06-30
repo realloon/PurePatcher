@@ -11,6 +11,7 @@
     <RootNamespace>PurePatcher</RootNamespace>
     <AssemblyName>PurePatcher</AssemblyName>
     <ResolveAssemblyReferencesFindRelatedFiles>false</ResolveAssemblyReferencesFindRelatedFiles>
+    <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
