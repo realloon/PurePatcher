@@ -16,6 +16,9 @@ internal static class GameProcessing {
         GameInjections.RegisterInjections(fieldAdder);
         fieldAdder.ProcessAllAssemblies();
 
+        // Method replacement
+        MethodReplacer.RunReplacements(set);
+
         // Fix the update order of RimWorld's reloaded Unity components
         ExecutionOrderFixer.ApplyExecutionOrderAttributes(asmCSharp.ModuleDefinition);
         asmCSharp.Modified = true; // Mark as modified so it's serialized and new attributes are applied
