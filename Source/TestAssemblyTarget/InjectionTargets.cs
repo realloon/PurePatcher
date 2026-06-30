@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 
+// ReSharper disable InconsistentNaming
+
 namespace TestAssemblyTarget;
 
 public abstract class BaseComp {
-    public BaseWithComps Parent = null!;
+    // ReSharper disable once NotAccessedField.Global
+    public BaseWithComps parent = null!;
 }
 
 public class OtherComp : BaseComp;
@@ -11,16 +14,16 @@ public class OtherComp : BaseComp;
 public class InjectionBase;
 
 public class BaseWithComps : InjectionBase {
-    public readonly List<BaseComp> Comps = [];
+    public readonly List<BaseComp> comps = [];
     public Type[] CompTypes = null!;
 
     public void InitComps() {
-        Comps.Clear();
+        comps.Clear();
 
         foreach (var type in CompTypes) {
             var comp = (BaseComp)Activator.CreateInstance(type);
-            comp.Parent = this;
-            Comps.Add(comp);
+            comp.parent = this;
+            comps.Add(comp);
         }
     }
 }
