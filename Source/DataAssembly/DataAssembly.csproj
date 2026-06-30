@@ -8,7 +8,7 @@
     <OutputPath>..\..\Assemblies\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <AssemblyName>0PurePatcherDataAssembly</AssemblyName>
+    <AssemblyName>PurePatcher.DataAssembly</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
