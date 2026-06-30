@@ -8,13 +8,9 @@ namespace PurePatcher;
 internal class PurePatcherMod : Mod {
     private const string CmdArgVerbose = "verbose";
 
-    internal const string PurePatcherModId = "vortex.purepatcher";
-    internal const string HarmonyModId = "brrainz.harmony";
-
     public PurePatcherMod(ModContentPack content) : base(content) {
         InitLg();
 
-        HarmonyPatches.PatchModLoading();
         HarmonyPatches.AddVerboseProfiling();
 
         if (DataStore.startedOnce) {

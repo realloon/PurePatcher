@@ -17,16 +17,12 @@ The project has two main logical components:
 
 - Download the mod by clicking _Code_ > _Download ZIP_ on this repo's main page
 - Unzip in RimWorld's Mods folder
-- Open the game and put PurePatcher first in the mod list. It has no dependencies on other mods.
+- Install HarmonyRimWorld and put Harmony before PurePatcher.
+- Put PurePatcher before Core in the mod list.
 
 The mod is currently no longer distributed through GitHub's Releases tab.
 
-PurePatcher is a provider of the Harmony library for RimWorld mods and can be used instead of [HarmonyRimWorld](https://github.com/pardeike/HarmonyRimWorld). It patches the mod loading system so that:
-
-- `Vortex.PurePatcher` (this mod) satisfies dependencies on `brrainz.harmony`
-- Mods needing to load after `brrainz.harmony` also need to load after `Vortex.PurePatcher`
-
-Having both PurePatcher and the Harmony mod active won't cause any problems.
+PurePatcher requires [HarmonyRimWorld](https://github.com/pardeike/HarmonyRimWorld) and is not a replacement for it.
 
 ### Modders
 
