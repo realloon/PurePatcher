@@ -5,18 +5,18 @@ using Tests.Helpers;
 namespace Tests;
 
 internal class TestExceptions : Test {
-    private TypeDefinition typeFail = null!;
+    private TypeDefinition _typeFail = null!;
 
     [OneTimeSetUp]
     public override void Setup() {
         base.Setup();
-        typeFail = testAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(BadFields)}");
+        _typeFail = TestAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(BadFields)}");
     }
 
     [Test]
     public void TestBadFieldAccessors() {
-        foreach (var accessor in FieldAdder.GetAllPurePatcherFieldAccessors(TestExtensions.EnumerableOf(typeFail))) {
-            Assert.Throws<LogErrorException>(() => { fieldAdder.ProcessAccessor(accessor); }, accessor.Name);
+        foreach (var accessor in FieldAdder.GetAllPurePatcherFieldAccessors(TestExtensions.EnumerableOf(_typeFail))) {
+            Assert.Throws<LogErrorException>(() => { FieldAdder.ProcessAccessor(accessor); }, accessor.Name);
         }
     }
 }

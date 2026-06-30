@@ -10,9 +10,9 @@ using Tests.Helpers;
 namespace Tests;
 
 internal class Test {
-    protected AssemblySet set = null!;
-    protected FieldAdder fieldAdder = null!;
-    protected ModifiableAssembly testAsm = null!;
+    protected AssemblySet Set = null!;
+    protected FieldAdder FieldAdder = null!;
+    protected ModifiableAssembly TestAsm = null!;
 
     public virtual void Setup() {
         Lg.InfoFunc = Console.WriteLine;
@@ -23,21 +23,21 @@ internal class Test {
 
         var liveAsms = LoadLiveAsms();
 
-        set = new AssemblySet();
-        fieldAdder = new FieldAdder(set);
+        Set = new AssemblySet();
+        FieldAdder = new FieldAdder(Set);
 
-        var targetAsm = set.AddAssembly("Test", "TestAssemblyTarget.dll", AssemblyPath("TestAssemblyTarget.dll"), null);
+        var targetAsm = Set.AddAssembly("Test", "TestAssemblyTarget.dll", AssemblyPath("TestAssemblyTarget.dll"), null);
         targetAsm.ProcessAttributes = true;
         targetAsm.SourceAssembly = liveAsms.Target;
 
-        testAsm = set.AddAssembly("Test", "TestAssembly.dll", AssemblyPath("TestAssembly.dll"), null);
-        testAsm.ProcessAttributes = true;
-        testAsm.SourceAssembly = liveAsms.Test;
+        TestAsm = Set.AddAssembly("Test", "TestAssembly.dll", AssemblyPath("TestAssembly.dll"), null);
+        TestAsm.ProcessAttributes = true;
+        TestAsm.SourceAssembly = liveAsms.Test;
 
         var typeThingWithComps = targetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseWithComps");
         var typeThingComp = targetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseComp");
 
-        fieldAdder.RegisterInjection(
+        FieldAdder.RegisterInjection(
             typeThingWithComps,
             typeThingComp,
             "InitComps",
