@@ -31,6 +31,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Annotations\Annotations.csproj" />
+    <ProjectReference Include="..\DataAssembly\DataAssembly.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Publicize Include="UnityEngine.CoreModule; UnityEngine.UIElementsModule; Assembly-CSharp; 0Harmony" />
   </ItemGroup>
 
@@ -38,11 +43,6 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Tests</_Parameter1>
     </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Annotations\Annotations.csproj" />
-    <ProjectReference Include="..\DataAssembly\DataAssembly.csproj" />
   </ItemGroup>
 
 </Project>
