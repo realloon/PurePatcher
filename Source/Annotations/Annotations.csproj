@@ -14,6 +14,10 @@
         <Description>Annotations for PurePatcher, a structured assembly rewriting library for RimWorld.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageId>PurePatcher.Annotations</PackageId>
+        <PackageProjectUrl>https://github.com/realloon/PurePatcher</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/realloon/PurePatcher</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
@@ -28,6 +32,8 @@
 
   <ItemGroup>
     <Using Include="System" />
+
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
 
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>TestAssembly</_Parameter1>
