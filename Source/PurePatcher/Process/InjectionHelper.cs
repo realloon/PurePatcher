@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace PurePatcher.Process;
 
 public static class InjectionHelper {

@@ -4,6 +4,7 @@
     <TargetFramework>net48</TargetFramework>
     <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputPath>..\..\Assemblies\</OutputPath>
     <RootNamespace>PurePatcher</RootNamespace>
@@ -34,8 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="System" />
-
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Tests</_Parameter1>
     </AssemblyAttribute>

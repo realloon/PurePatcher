@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
