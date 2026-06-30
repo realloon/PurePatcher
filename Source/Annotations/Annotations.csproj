@@ -1,34 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
-        <LangVersion>14</LangVersion>
-        <Nullable>enable</Nullable>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <RootNamespace>PurePatcher.Annotations</RootNamespace>
-        <AssemblyName>PurePatcher.Annotations</AssemblyName>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Authors>Vortex</Authors>
-        <Version>1.0.0</Version>
-        <Description>Annotations for PurePatcher, a structured assembly rewriting library for RimWorld.</Description>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageId>PurePatcher.Annotations</PackageId>
-        <PackageProjectUrl>https://github.com/realloon/PurePatcher</PackageProjectUrl>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <RepositoryUrl>https://github.com/realloon/PurePatcher</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>14</LangVersion>
+    <Nullable>enable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <RootNamespace>PurePatcher.Annotations</RootNamespace>
+    <AssemblyName>PurePatcher.Annotations</AssemblyName>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Vortex</Authors>
+    <Version>1.0.0</Version>
+    <Description>Annotations for PurePatcher, a structured assembly rewriting library for RimWorld.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>PurePatcher.Annotations</PackageId>
+    <PackageProjectUrl>https://github.com/realloon/PurePatcher</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/realloon/PurePatcher</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DebugType>none</DebugType>
-    </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DebugSymbols>false</DebugSymbols>
-      <DebugType>none</DebugType>
-    </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
 
   <ItemGroup>
     <Using Include="System" />
