@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using LudeonTK;
 using Prepatcher.Process;
-using Prestarter;
 using UnityEngine;
 using Verse;
 using Verse.Steam;
@@ -20,8 +17,6 @@ internal static class Loader
 
     internal static void Reload()
     {
-        HarmonyPatches.holdLoading = true;
-
         try
         {
             Lg.Verbose("Reloading the game");
@@ -36,13 +31,8 @@ internal static class Loader
         catch (Exception e)
         {
             Lg.Error($"Fatal error while reloading: {e}");
+            throw;
         }
-
-        if (restartGame) return;
-
-        UnsafeAssembly.UnsetRefonlys();
-        Find.Root.StartCoroutine(MinimalInit.DoInit());
-        Find.Root.StartCoroutine(ShowLogConsole());
     }
 
     private static void DoReload()
@@ -83,14 +73,8 @@ internal static class Loader
         Reloader.Reload(
             set,
             LoadAssembly,
-            () =>
+            beforeRefOnlys: () =>
             {
-                HarmonyPatches.SetLoadingStage("Serializing assemblies"); // Point where the mod manager can get opened
-            },
-            () =>
-            {
-                HarmonyPatches.SetLoadingStage("Reloading game"); // Point where the mod manager can get opened
-
                 HarmonyPatches.PatchRootMethods();
                 Application.logMessageReceivedThreaded -= Log.Notify_MessageReceivedThreadedInternal;
                 UnregisterWorkshopCallbacks();
@@ -116,15 +100,6 @@ internal static class Loader
             if (asm.Modified)
                 File.WriteAllBytes(Path.Combine(path, asm.AsmDefinition.Name.Name + ".dll"), asm.Bytes!);
         }
-    }
-
-    private static IEnumerator ShowLogConsole()
-    {
-        yield return null;
-
-        LongEventHandler.currentEvent = null;
-        Find.WindowStack.Add(new EditWindow_Log { doCloseX = false });
-        UIRoot_Prestarter.showManager = false;
     }
 
     private static void UnregisterWorkshopCallbacks()

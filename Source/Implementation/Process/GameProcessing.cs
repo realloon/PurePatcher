@@ -23,10 +23,6 @@ internal static class GameProcessing
         asmCSharp.Modified = true; // Mark as modified so it's serialized and new attributes are applied
 
         // Free patching
-        FreePatcher.RunPatches(
-            set,
-            AssemblyCollector.AssemblyCSharp,
-            asm => HarmonyPatches.SetLoadingStage($"Applying prepatches from {asm.OwnerName}")
-        );
+        FreePatcher.RunPatches(set, AssemblyCollector.AssemblyCSharp);
     }
 }

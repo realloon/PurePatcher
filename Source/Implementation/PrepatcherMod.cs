@@ -18,9 +18,6 @@ internal class PrepatcherMod : Mod
 
         HarmonyPatches.PatchModLoading();
         HarmonyPatches.AddVerboseProfiling();
-        HarmonyPatches.PatchGUI();
-
-        HarmonyPatches.SetLoadingStage("Initializing Prepatcher");
 
         if (DataStore.startedOnce)
         {
@@ -33,8 +30,6 @@ internal class PrepatcherMod : Mod
             Lg.Info($"Restarted with the patched assembly, going silent.");
             return;
         }
-
-        // EditWindow_Log.wantsToOpen = false;
 
         DataStore.startedOnce = true;
         Lg.Info($"Starting... (vanilla load took {Time.realtimeSinceStartup}s)");

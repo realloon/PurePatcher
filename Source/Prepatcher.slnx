@@ -2,7 +2,6 @@
   <Project Path="API/API.csproj" />
   <Project Path="DataAssembly/DataAssembly.csproj" />
   <Project Path="Implementation/Implementation.csproj" />
-  <Project Path="Prestarter/Prestarter.csproj" />
   <Project Path="TestAssembly/TestAssembly.csproj" />
   <Project Path="TestAssemblyTarget/TestAssemblyTarget.csproj" />
   <Project Path="Tests/Tests.csproj" />

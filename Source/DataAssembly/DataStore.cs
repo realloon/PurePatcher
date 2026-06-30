@@ -6,7 +6,4 @@ namespace DataAssembly;
 public static class DataStore
 {
     public static bool startedOnce;
-
-    public static volatile bool openModManager;
-    public static volatile string? loadingStage = null;
 }
