@@ -13,6 +13,7 @@ internal class TestPatches : Test {
             TestAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(Injections)}")
         ]);
 
+        MethodReplacer.RunReplacements(Set);
         FreePatcher.RunPatches(Set, "TestAssemblyTarget");
         Reloader.Reload(Set, LoadAssembly);
     }
@@ -103,6 +104,14 @@ internal class TestPatches : Test {
         Assert.Multiple(() => {
             Assert.That(FreePatching.TestRewriteTargetMethod(), Is.EqualTo(1));
             Assert.That(FreePatching.TestRewriteTargetMethod2(), Is.EqualTo("b"));
+        });
+    }
+
+    [Test]
+    public void TestMethodReplacement() {
+        Assert.Multiple(() => {
+            Assert.That(MethodReplacement.TestInstanceMethod(), Is.EqualTo(12));
+            Assert.That(MethodReplacement.TestStaticMethod(), Is.EqualTo("ab"));
         });
     }
 }

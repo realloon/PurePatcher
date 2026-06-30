@@ -5,3 +5,11 @@ public class RewriteTarget {
 
     public string Method2() => "a";
 }
+
+public class ReplaceMethodTarget {
+    public const int BaseValue = 7;
+
+    public int InstanceMethod(int value) => value;
+
+    public static string StaticMethod(string value) => value;
+}
