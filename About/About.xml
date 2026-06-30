@@ -4,9 +4,16 @@
   <name>PurePatcher</name>
   <description>PurePatcher is a structured assembly rewriting library for RimWorld mod developers.</description>
   <author>Zetrith, Vortex</author>
+  <modVersion>1.1.0</modVersion>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
+  <loadAfter>
+    <li>brrainz.harmony</li>
+  </loadAfter>
+  <loadBefore>
+    <li>Ludeon.RimWorld</li>
+  </loadBefore>
   <modDependencies>
     <li>
       <packageId>brrainz.harmony</packageId>
@@ -14,10 +21,4 @@
       <downloadUrl>https://github.com/pardeike/HarmonyRimWorld</downloadUrl>
     </li>
   </modDependencies>
-  <loadAfter>
-    <li>brrainz.harmony</li>
-  </loadAfter>
-  <loadBefore>
-    <li>Ludeon.RimWorld</li>
-  </loadBefore>
 </ModMetaData>
