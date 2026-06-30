@@ -1,5 +1,12 @@
 .DS_Store
 
+# Dist
 Assemblies/
+
+# Source
 **/bin/
 **/obj/
+
+# Rider
+Source/.idea/.idea.Prepatcher/.idea/workspace.xml
+Source/.idea/.idea.Prepatcher/.idea/workspace.xml
