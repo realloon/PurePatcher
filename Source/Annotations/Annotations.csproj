@@ -4,8 +4,6 @@
     <TargetFramework>net48</TargetFramework>
     <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <RootNamespace>PurePatcher.Annotations</RootNamespace>
     <AssemblyName>PurePatcher.Annotations</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
