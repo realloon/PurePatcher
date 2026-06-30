@@ -8,11 +8,9 @@ using Verse;
 
 namespace Prepatcher;
 
-public static class AssemblyLoadingFreePatch
-{
+public static class AssemblyLoadingFreePatch {
     [FreePatch]
-    static void ReplaceAssemblyLoading(ModuleDefinition module)
-    {
+    static void ReplaceAssemblyLoading(ModuleDefinition module) {
         var type = module.GetType($"{nameof(Verse)}.{nameof(ModAssemblyHandler)}");
         var method = type.FindMethod(nameof(ModAssemblyHandler.ReloadAll));
 
@@ -21,8 +19,7 @@ public static class AssemblyLoadingFreePatch
                 inst.Operand = module.ImportReference(typeof(AssemblyLoadingFreePatch).GetMethod(nameof(LoadFrom)));
     }
 
-    public static Assembly LoadFrom(string filePath)
-    {
+    public static Assembly LoadFrom(string filePath) {
         var asmName = AssemblyName.GetAssemblyName(filePath);
         var asmWithName = AppDomain.CurrentDomain.GetAssemblies()
             .FirstOrDefault(a => a.GetName().Name == asmName.Name);
@@ -31,14 +28,13 @@ public static class AssemblyLoadingFreePatch
             return asmWithName;
 
         var rawAssembly = File.ReadAllBytes(filePath);
-        var fileInfo = new FileInfo(Path.Combine(Path.GetDirectoryName(filePath)!, Path.GetFileNameWithoutExtension(filePath)) + ".pdb");
-        if (fileInfo.Exists)
-        {
+        var fileInfo =
+            new FileInfo(Path.Combine(Path.GetDirectoryName(filePath)!, Path.GetFileNameWithoutExtension(filePath)) +
+                         ".pdb");
+        if (fileInfo.Exists) {
             var rawSymbolStore = File.ReadAllBytes(fileInfo.FullName);
             return AppDomain.CurrentDomain.Load(rawAssembly, rawSymbolStore);
-        }
-        else
-        {
+        } else {
             return AppDomain.CurrentDomain.Load(rawAssembly);
         }
     }

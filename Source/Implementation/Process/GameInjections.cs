@@ -3,10 +3,8 @@ using Verse;
 
 namespace Prepatcher.Process;
 
-internal static class GameInjections
-{
-    internal static void RegisterInjections(FieldAdder fieldAdder)
-    {
+internal static class GameInjections {
+    internal static void RegisterInjections(FieldAdder fieldAdder) {
         Lg.Verbose("Registering injections");
 
         fieldAdder.RegisterInjection(

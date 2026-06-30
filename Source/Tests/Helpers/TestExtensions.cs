@@ -2,15 +2,12 @@
 
 namespace Tests;
 
-public static class TestExtensions
-{
-    internal static IEnumerable<T> EnumerableOf<T>(T obj)
-    {
+public static class TestExtensions {
+    internal static IEnumerable<T> EnumerableOf<T>(T obj) {
         yield return obj;
     }
 
-    internal static void Do<T>(this T obj, Action<T> action)
-    {
+    internal static void Do<T>(this T obj, Action<T> action) {
         action(obj);
     }
 }

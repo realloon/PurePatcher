@@ -9,16 +9,13 @@ using Verse.Steam;
 
 namespace Prepatcher;
 
-internal static class Loader
-{
+internal static class Loader {
     internal static Assembly origAsm;
     internal static Assembly newAsm;
     internal static volatile bool restartGame;
 
-    internal static void Reload()
-    {
-        try
-        {
+    internal static void Reload() {
+        try {
             Lg.Verbose("Reloading the game");
             DoReload();
 
@@ -27,23 +24,19 @@ internal static class Loader
 
             Lg.Info("Done loading");
             restartGame = true;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             Lg.Error($"Fatal error while reloading: {e}");
             throw;
         }
     }
 
-    private static void DoReload()
-    {
+    private static void DoReload() {
         origAsm = typeof(Game).Assembly;
 
         var set = new AssemblySet();
         set.AddAssembly("RimWorld", AssemblyCollector.AssemblyCSharp, null, typeof(Game).Assembly);
 
-        foreach (var (friendlyName, path) in AssemblyCollector.SystemAssemblyPaths())
-        {
+        foreach (var (friendlyName, path) in AssemblyCollector.SystemAssemblyPaths()) {
             if (AssemblyName.GetAssemblyName(path).Name == AssemblyCollector.AssemblyCSharp)
                 continue;
 
@@ -51,8 +44,7 @@ internal static class Loader
             addedAsm.AllowPatches = false;
         }
 
-        foreach (var (modName, friendlyName, asm) in AssemblyCollector.ModAssemblies())
-        {
+        foreach (var (modName, friendlyName, asm) in AssemblyCollector.ModAssemblies()) {
             var name = asm.GetName().Name;
 
             // Don't add system assemblies packaged by mods
@@ -73,8 +65,7 @@ internal static class Loader
         Reloader.Reload(
             set,
             LoadAssembly,
-            beforeRefOnlys: () =>
-            {
+            beforeRefOnlys: () => {
                 HarmonyPatches.PatchRootMethods();
                 Application.logMessageReceivedThreaded -= Log.Notify_MessageReceivedThreadedInternal;
                 UnregisterWorkshopCallbacks();
@@ -83,27 +74,23 @@ internal static class Loader
         );
     }
 
-    private static void LoadAssembly(ModifiableAssembly asm)
-    {
+    private static void LoadAssembly(ModifiableAssembly asm) {
         Lg.Verbose($"Loading assembly: {asm}");
 
         var loadedAssembly = Assembly.Load(asm.Bytes);
-        if (loadedAssembly.GetName().Name == AssemblyCollector.AssemblyCSharp)
-        {
+        if (loadedAssembly.GetName().Name == AssemblyCollector.AssemblyCSharp) {
             newAsm = loadedAssembly;
             AppDomain.CurrentDomain.AssemblyResolve += (_, _) => loadedAssembly;
         }
 
-        if (GenCommandLine.TryGetCommandLineArg("dumpasms", out var path) && !path.Trim().NullOrEmpty())
-        {
+        if (GenCommandLine.TryGetCommandLineArg("dumpasms", out var path) && !path.Trim().NullOrEmpty()) {
             Directory.CreateDirectory(path);
             if (asm.Modified)
                 File.WriteAllBytes(Path.Combine(path, asm.AsmDefinition.Name.Name + ".dll"), asm.Bytes!);
         }
     }
 
-    private static void UnregisterWorkshopCallbacks()
-    {
+    private static void UnregisterWorkshopCallbacks() {
         Lg.Verbose("Unregistering workshop callbacks");
 
         // These hold references to old code and would get called externally by Steam
@@ -112,22 +99,17 @@ internal static class Loader
         Workshop.installedCallback?.Unregister();
     }
 
-    private static void ClearAssemblyResolve()
-    {
+    private static void ClearAssemblyResolve() {
         Lg.Verbose("Clearing AppDomain.AssemblyResolve");
 
         var asmResolve = AccessTools.Field(typeof(AppDomain), "AssemblyResolve");
         var del = (Delegate)asmResolve.GetValue(AppDomain.CurrentDomain);
 
         // Handle MonoMod's internal dynamic assemblies
-        foreach (var d in del.GetInvocationList().ToList())
-        {
-            if (d!.Method.DeclaringType!.Namespace!.StartsWith("MonoMod.Utils"))
-            {
-                foreach (var f in AccessTools.GetDeclaredFields(d.Method.DeclaringType))
-                {
-                    if (f.FieldType == typeof(Assembly))
-                    {
+        foreach (var d in del.GetInvocationList().ToList()) {
+            if (d!.Method.DeclaringType!.Namespace!.StartsWith("MonoMod.Utils")) {
+                foreach (var f in AccessTools.GetDeclaredFields(d.Method.DeclaringType)) {
+                    if (f.FieldType == typeof(Assembly)) {
                         var da = (Assembly)f.GetValue(d.Target);
                         Reloader.setRefonly.Add(da);
                     }

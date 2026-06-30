@@ -1,14 +1,11 @@
 namespace TestAssemblyTarget;
 
-public class RewriteTarget
-{
-    public int Method()
-    {
+public class RewriteTarget {
+    public int Method() {
         return 0;
     }
 
-    public string Method2()
-    {
+    public string Method2() {
         return "a";
     }
 }

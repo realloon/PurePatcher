@@ -4,8 +4,7 @@ using Mono.Cecil;
 
 namespace Prepatcher.Process;
 
-public class ModifiableAssembly
-{
+public class ModifiableAssembly {
     public string OwnerName { get; }
     public string FriendlyName { get; }
 
@@ -23,8 +22,8 @@ public class ModifiableAssembly
 
     private bool needsReload;
 
-    public ModifiableAssembly(string ownerName, string friendlyName, Assembly sourceAssembly, IAssemblyResolver resolver)
-    {
+    public ModifiableAssembly(string ownerName, string friendlyName, Assembly sourceAssembly,
+        IAssemblyResolver resolver) {
         OwnerName = ownerName;
         FriendlyName = friendlyName;
         SourceAssembly = sourceAssembly;
@@ -32,14 +31,12 @@ public class ModifiableAssembly
         RawBytes = UnsafeAssembly.GetRawData(sourceAssembly);
         AsmDefinition = AssemblyDefinition.ReadAssembly(
             new MemoryStream(RawBytes),
-            new ReaderParameters
-            {
+            new ReaderParameters {
                 AssemblyResolver = resolver
             });
     }
 
-    public ModifiableAssembly(string ownerName, string friendlyName, string path, IAssemblyResolver resolver)
-    {
+    public ModifiableAssembly(string ownerName, string friendlyName, string path, IAssemblyResolver resolver) {
         OwnerName = ownerName;
         FriendlyName = friendlyName;
         AsmDefinition = AssemblyDefinition.ReadAssembly(
@@ -48,10 +45,8 @@ public class ModifiableAssembly
         );
     }
 
-    public void SerializeToByteArray()
-    {
-        if (RawBytes != null && !Modified)
-        {
+    public void SerializeToByteArray() {
+        if (RawBytes != null && !Modified) {
             Lg.Verbose($"Assembly not modified, skipping serialization: {FriendlyName}");
             Bytes = RawBytes;
             return;
@@ -63,19 +58,16 @@ public class ModifiableAssembly
         Bytes = stream.ToArray();
     }
 
-    public void SetSourceRefOnly()
-    {
+    public void SetSourceRefOnly() {
         Lg.Verbose($"Setting refonly: {FriendlyName}");
         UnsafeAssembly.SetReflectionOnly(SourceAssembly!, true);
     }
 
-    public void SetNeedsReload()
-    {
+    public void SetNeedsReload() {
         needsReload = true;
     }
 
-    public override string ToString()
-    {
+    public override string ToString() {
         return FriendlyName;
     }
 }

@@ -7,14 +7,11 @@ using Verse;
 
 namespace Prepatcher.Process;
 
-internal static class ExecutionOrderFixer
-{
-    internal static void ApplyExecutionOrderAttributes(ModuleDefinition asmCSharp)
-    {
+internal static class ExecutionOrderFixer {
+    internal static void ApplyExecutionOrderAttributes(ModuleDefinition asmCSharp) {
         // Extracted using AssetRipper
         // These are the only scripts with non-zero executionOrder in .cs.meta
-        var vanillaOrder = new[]
-        {
+        var vanillaOrder = new[] {
             (typeof(LatestVersionGetter), -80),
             (typeof(WorldCameraDriver), -50),
             (typeof(BlackScreenFixer), -100),
@@ -29,15 +26,12 @@ internal static class ExecutionOrderFixer
             typeof(DefaultExecutionOrder).GetConstructor(new[] { typeof(int) })
         );
 
-        foreach (var (t, order) in vanillaOrder)
-        {
+        foreach (var (t, order) in vanillaOrder) {
             if (t == null) continue;
 
             var resolved = asmCSharp.ImportReference(t).Resolve();
-            var attr = new CustomAttribute(attrCtor)
-            {
-                ConstructorArguments =
-                {
+            var attr = new CustomAttribute(attrCtor) {
+                ConstructorArguments = {
                     new CustomAttributeArgument(
                         asmCSharp.TypeSystem.Int32,
                         order

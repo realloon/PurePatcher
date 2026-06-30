@@ -1,6 +1,4 @@
 ﻿namespace Prepatcher;
 
 [AttributeUsage(AttributeTargets.Method)]
-internal class PrepatcherOverrideAttribute : Attribute
-{
-}
+internal class PrepatcherOverrideAttribute : Attribute { }

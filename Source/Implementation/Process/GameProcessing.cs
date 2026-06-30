@@ -1,9 +1,7 @@
 ﻿namespace Prepatcher.Process;
 
-internal static class GameProcessing
-{
-    internal static void Process(AssemblySet set)
-    {
+internal static class GameProcessing {
+    internal static void Process(AssemblySet set) {
         var asmCSharp = set.FindAssembly(AssemblyCollector.AssemblyCSharp)!;
 
         // Other code assumes that these always get reloaded

@@ -3,15 +3,12 @@ using TestAssemblyTarget;
 
 namespace Tests;
 
-internal class TestPatches : TestBase
-{
+internal class TestPatches : TestBase {
     [OneTimeSetUp]
-    public override void Setup()
-    {
+    public override void Setup() {
         base.Setup();
 
-        fieldAdder.ProcessTypes(new[]
-        {
+        fieldAdder.ProcessTypes(new[] {
             testAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(NewFields)}"),
             testAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(DefaultValues)}"),
             testAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(Injections)}")
@@ -22,8 +19,7 @@ internal class TestPatches : TestBase
     }
 
     [Test]
-    public void TestNewFields()
-    {
+    public void TestNewFields() {
         Assert.That(NewFields.TestIntField(1), Is.EqualTo(1));
         Assert.That(NewFields.TestIntStructField(1), Is.EqualTo(1));
         Assert.That(NewFields.TestGenericField1("test1"), Is.EqualTo("test1"));
@@ -32,8 +28,7 @@ internal class TestPatches : TestBase
     }
 
     [Test]
-    public void TestInjections()
-    {
+    public void TestInjections() {
         Injections.TestOtherCompInjection().Do(c => Assert.That(c, Is.EqualTo(c.parent.comps[1])));
         Injections.TestCompInjection().Do(c => Assert.That(c, Is.EqualTo(c.parent.comps[0])));
         Injections.TestCompInjection_DoubleInit().Do(c => Assert.That(c, Is.EqualTo(c.parent.comps[0])));
@@ -44,8 +39,7 @@ internal class TestPatches : TestBase
     }
 
     [Test]
-    public void TestDefaultValues()
-    {
+    public void TestDefaultValues() {
         var targetObj = new TargetClass();
 
         Assert.That(targetObj.MyBoolDefaultFalse(), Is.EqualTo(false));
@@ -80,8 +74,7 @@ internal class TestPatches : TestBase
     }
 
     [Test]
-    public void TestDefaultValueInitializers()
-    {
+    public void TestDefaultValueInitializers() {
         var targetObj = new TargetClass();
         Assert.That(targetObj.MyIntParameterless(), Is.EqualTo(DefaultValues.IntParameterlessInitializer()));
 
@@ -101,8 +94,7 @@ internal class TestPatches : TestBase
     }
 
     [Test]
-    public void TestFreePatching()
-    {
+    public void TestFreePatching() {
         Assert.That(new RewriteTarget().Method(), Is.EqualTo(1));
         Assert.That(new RewriteTarget().Method2(), Is.EqualTo("b"));
     }

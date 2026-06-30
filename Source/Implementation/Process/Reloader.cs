@@ -5,12 +5,11 @@ using HarmonyLib;
 
 namespace Prepatcher.Process;
 
-internal static class Reloader
-{
+internal static class Reloader {
     internal static List<Assembly> setRefonly = new();
 
-    internal static void Reload(AssemblySet set, Action<ModifiableAssembly> loadAssemblyAction, Action? beforeSerialization = null, Action? beforeRefOnlys = null)
-    {
+    internal static void Reload(AssemblySet set, Action<ModifiableAssembly> loadAssemblyAction,
+        Action? beforeSerialization = null, Action? beforeRefOnlys = null) {
         PropagateNeedsReload(set);
 
         beforeSerialization?.Invoke();
@@ -35,12 +34,12 @@ internal static class Reloader
             loadAssemblyAction(toReload);
     }
 
-    private static void PropagateNeedsReload(AssemblySet set)
-    {
+    private static void PropagateNeedsReload(AssemblySet set) {
         var assembliesToReloadStart = set.AllAssemblies.Where(m => m.NeedsReload);
         var assemblyToDependants = set.AllAssembliesToDependants();
 
-        foreach (var asm in Util.BFS(assembliesToReloadStart, asm => assemblyToDependants.GetValueSafe(asm) ?? Enumerable.Empty<ModifiableAssembly>()))
+        foreach (var asm in Util.BFS(assembliesToReloadStart,
+                     asm => assemblyToDependants.GetValueSafe(asm) ?? Enumerable.Empty<ModifiableAssembly>()))
             asm.SetNeedsReload();
     }
 }

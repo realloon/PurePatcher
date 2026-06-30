@@ -8,8 +8,7 @@ using TestAssemblyTarget;
 
 namespace Tests;
 
-internal class TestBase
-{
+internal class TestBase {
     protected AssemblySet set;
     protected FieldAdder fieldAdder;
 
@@ -19,11 +18,9 @@ internal class TestBase
     private Assembly liveTestAsm;
     private Assembly liveTargetAsm;
 
-    public virtual void Setup()
-    {
+    public virtual void Setup() {
         Lg._infoFunc = Console.WriteLine;
-        Lg._errorFunc = msg =>
-        {
+        Lg._errorFunc = msg => {
             Console.WriteLine(msg);
             throw new LogErrorException($"{msg}");
         };
@@ -33,7 +30,7 @@ internal class TestBase
         set = new AssemblySet();
         fieldAdder = new FieldAdder(set);
 
-        targetAsm = set.AddAssembly("Test","TestAssemblyTarget.dll", "TestAssemblyTarget.dll", null);
+        targetAsm = set.AddAssembly("Test", "TestAssemblyTarget.dll", "TestAssemblyTarget.dll", null);
         targetAsm.ProcessAttributes = true;
 
         testAsm = set.AddAssembly("Test", "TestAssembly.dll", "TestAssembly.dll", null);
@@ -54,8 +51,7 @@ internal class TestBase
     }
 
     // Load the test assemblies and make them resolvable for freepatch testing
-    private void LoadLiveAsms()
-    {
+    private void LoadLiveAsms() {
         const string testAssemblyTargetNewName = "TestAssemblyTarget1";
 
         using var testAsmToBeLive = ModuleDefinition.ReadModule("TestAssembly.dll");
@@ -92,8 +88,7 @@ internal class TestBase
             (_, args) => args.Name.StartsWith(testAssemblyTargetNewName) ? liveTargetAsm : null;
     }
 
-    protected static void WriteAssembly(ModifiableAssembly asm)
-    {
+    protected static void WriteAssembly(ModifiableAssembly asm) {
         // Replaces the actual assembly file that will get auto-loaded by the runtime
         File.WriteAllBytes(asm.AsmDefinition.ShortName() + ".dll", asm.Bytes!);
     }

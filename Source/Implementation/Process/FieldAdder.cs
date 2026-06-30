@@ -10,31 +10,25 @@ using MethodImplAttributes = Mono.Cecil.MethodImplAttributes;
 
 namespace Prepatcher.Process;
 
-internal partial class FieldAdder
-{
+internal partial class FieldAdder {
     private readonly AssemblySet set;
 
-    public FieldAdder(AssemblySet set)
-    {
+    public FieldAdder(AssemblySet set) {
         this.set = set;
     }
 
-    internal void ProcessAllAssemblies()
-    {
+    internal void ProcessAllAssemblies() {
         foreach (var asm in set.AllAssemblies.Where(a => a.ProcessAttributes))
             ProcessTypes(asm.ModuleDefinition.Types);
     }
 
-    internal void ProcessTypes(IEnumerable<TypeDefinition> inTypes)
-    {
+    internal void ProcessTypes(IEnumerable<TypeDefinition> inTypes) {
         foreach (var accessor in GetAllPrepatcherFieldAccessors(inTypes))
             ProcessAccessor(accessor);
     }
 
-    internal void ProcessAccessor(MethodDefinition accessor)
-    {
-        if (CheckFieldAccessor(accessor) is { } error)
-        {
+    internal void ProcessAccessor(MethodDefinition accessor) {
+        if (CheckFieldAccessor(accessor) is { } error) {
             var accessorAsm = set.FindAssembly(accessor.DeclaringType);
             Lg.Error($"{accessorAsm}: {error} for new field with accessor {accessor.MemberFullName()}");
             return;
@@ -53,8 +47,7 @@ internal partial class FieldAdder
             PatchCtorsWithInitializer(accessor, newField, initializerAttr);
     }
 
-    private FieldDefinition AddFieldToTarget(MethodDefinition accessor)
-    {
+    private FieldDefinition AddFieldToTarget(MethodDefinition accessor) {
         var targetType = FirstParameterTypeResolved(accessor)!;
         var fieldType = ImportFieldTypeIntoTargetModule(accessor);
 
@@ -75,8 +68,7 @@ internal partial class FieldAdder
         return ceField;
     }
 
-    private void PatchAccessor(MethodDefinition accessor, FieldDefinition newField)
-    {
+    private void PatchAccessor(MethodDefinition accessor, FieldDefinition newField) {
         Lg.Verbose("Patching the accessor");
 
         accessor.ImplAttributes &= ~MethodImplAttributes.InternalCall; // Unextern
@@ -90,7 +82,8 @@ internal partial class FieldAdder
 
         var fieldRef = new FieldReference(
             FieldName(accessor),
-            accessor.Module.ImportReference(newField.FieldType, accessor.Module.ImportReference(newField.DeclaringType)),
+            accessor.Module.ImportReference(newField.FieldType,
+                accessor.Module.ImportReference(newField.DeclaringType)),
             fieldOwner
         );
 
@@ -107,35 +100,31 @@ internal partial class FieldAdder
         accessorAsm.Modified = true;
     }
 
-    private static TypeReference FieldType(MethodDefinition accessor)
-    {
-        return accessor.ReturnType.IsByReference ?
-            ((ByReferenceType)accessor.ReturnType).ElementType :
-            accessor.ReturnType;
+    private static TypeReference FieldType(MethodDefinition accessor) {
+        return accessor.ReturnType.IsByReference
+            ? ((ByReferenceType)accessor.ReturnType).ElementType
+            : accessor.ReturnType;
     }
 
-    private static TypeReference ImportFieldTypeIntoTargetModule(MethodDefinition accessor)
-    {
+    private static TypeReference ImportFieldTypeIntoTargetModule(MethodDefinition accessor) {
         var targetType = FirstParameterTypeResolved(accessor)!;
         var fieldType = FieldType(accessor);
         return targetType.Module.ImportReference(
             fieldType,
-            new DummyMethodReference(accessor.Name, targetType.Module.ImportReference(accessor.DeclaringType), targetType.GenericParameters)
+            new DummyMethodReference(accessor.Name, targetType.Module.ImportReference(accessor.DeclaringType),
+                targetType.GenericParameters)
         );
     }
 
-    private static TypeDefinition? FirstParameterTypeResolved(MethodDefinition methodDef)
-    {
+    private static TypeDefinition? FirstParameterTypeResolved(MethodDefinition methodDef) {
         return methodDef.Parameters.First().ParameterType.Resolve();
     }
 
-    private static string FieldName(MethodDefinition accessor)
-    {
+    private static string FieldName(MethodDefinition accessor) {
         return accessor.DeclaringType.Module.Assembly.ShortName() + accessor.Name + accessor.MetadataToken.RID;
     }
 
-    internal static IEnumerable<MethodDefinition> GetAllPrepatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes)
-    {
+    internal static IEnumerable<MethodDefinition> GetAllPrepatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes) {
         return
             from t in inTypes
             where t.IsSealed && t.IsAbstract // IsStatic
@@ -145,13 +134,12 @@ internal partial class FieldAdder
     }
 }
 
-internal class DummyMethodReference : MethodReference
-{
+internal class DummyMethodReference : MethodReference {
     private readonly Collection<GenericParameter> genericParameters;
     public override Collection<GenericParameter> GenericParameters => genericParameters;
 
-    public DummyMethodReference(string name, TypeReference declaringType, Collection<GenericParameter> genericParameters)
-    {
+    public DummyMethodReference(string name, TypeReference declaringType,
+        Collection<GenericParameter> genericParameters) {
         Name = name;
         DeclaringType = declaringType;
         this.genericParameters = genericParameters;

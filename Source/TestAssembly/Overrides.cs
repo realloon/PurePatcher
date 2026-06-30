@@ -3,8 +3,7 @@ using TestAssemblyTarget;
 
 namespace Tests;
 
-public static class Overrides
-{
+public static class Overrides {
     [PrepatcherOverride]
     public static int IntNonVirtual(OverrideMid obj) => obj.IntNonVirtual();
 
@@ -15,11 +14,9 @@ public static class Overrides
     public static int IntVirtual(OverrideMid obj) => obj.IntVirtual();
 }
 
-public class OverrideSub : OverrideMid
-{
+public class OverrideSub : OverrideMid {
     [PrepatcherOverride]
-    public new int IntNonVirtualArg_Instance(int a)
-    {
+    public new int IntNonVirtualArg_Instance(int a) {
         return base.IntNonVirtualArg_Instance(a) + 1;
     }
 }

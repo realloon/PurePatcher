@@ -5,9 +5,6 @@
 /// The method has to be in the same class as the PrepatcherField.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-public class ValueInitializerAttribute : Attribute
-{
-    public ValueInitializerAttribute(string initializerMethod)
-    {
-    }
+public class ValueInitializerAttribute : Attribute {
+    public ValueInitializerAttribute(string initializerMethod) { }
 }

@@ -4,10 +4,8 @@ using Mono.Cecil;
 
 namespace Prepatcher.Process;
 
-internal partial class FieldAdder
-{
-    private string? CheckFieldAccessor(MethodDefinition accessor)
-    {
+internal partial class FieldAdder {
+    private string? CheckFieldAccessor(MethodDefinition accessor) {
         if (accessor.Parameters.Count() != 1)
             return "Accessor must have exactly one parameter";
 
@@ -24,8 +22,7 @@ internal partial class FieldAdder
         if (!set.FindAssembly(target)!.AllowPatches)
             return "Target type is not modifiable";
 
-        if (HasInjection(accessor))
-        {
+        if (HasInjection(accessor)) {
             if (GetInjectionSite(accessor) == null)
                 return "Unknown injection owner type/component type pair";
 
@@ -36,8 +33,7 @@ internal partial class FieldAdder
         return null;
     }
 
-    private static IEnumerable<TypeReference> GenericArgumentsOf(TypeReference t)
-    {
+    private static IEnumerable<TypeReference> GenericArgumentsOf(TypeReference t) {
         return t is GenericInstanceType gType ? gType.GenericArguments : Enumerable.Empty<TypeReference>();
     }
 }

@@ -4,10 +4,8 @@ using Verse;
 
 namespace Prepatcher;
 
-internal static partial class HarmonyPatches
-{
-    internal static void SilenceLogging()
-    {
+internal static partial class HarmonyPatches {
+    internal static void SilenceLogging() {
         // Don't print thread abortion errors to log
         harmony.Patch(
             typeof(Log).GetMethod("Error", new[] { typeof(string) }),
@@ -21,13 +19,11 @@ internal static partial class HarmonyPatches
         );
     }
 
-    private static bool LogErrorPrefix(string text)
-    {
+    private static bool LogErrorPrefix(string text) {
         return !text.Contains("ThreadAbortException");
     }
 
-    private static bool LogWarningPrefix(string text)
-    {
+    private static bool LogWarningPrefix(string text) {
         if (!text.Contains("Tried to use an uninitialized DefOf"))
             return true;
         Debug.LogWarning(text);

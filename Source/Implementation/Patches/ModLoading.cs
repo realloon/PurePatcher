@@ -4,10 +4,8 @@ using Verse;
 
 namespace Prepatcher;
 
-internal static partial class HarmonyPatches
-{
-    internal static void PatchModLoading()
-    {
+internal static partial class HarmonyPatches {
+    internal static void PatchModLoading() {
         Lg.Verbose("Patching mod loading");
 
         // If a mod needs to loadAfter brrainz.harmony, then also loadAfter zetrith.prepatcher
@@ -27,15 +25,13 @@ internal static partial class HarmonyPatches
             InitVersionedDataPostfix(modMeta);
     }
 
-    private static void InitVersionedDataPostfix(ModMetaData.ModMetaDataInternal __instance)
-    {
+    private static void InitVersionedDataPostfix(ModMetaData.ModMetaDataInternal __instance) {
         if (__instance.loadAfter.Any(s => s.ToLowerInvariant() == PrepatcherMod.HarmonyModId) &&
             !__instance.loadAfter.Any(s => s.ToLowerInvariant() == PrepatcherMod.PrepatcherModId))
             __instance.loadAfter.Add(PrepatcherMod.PrepatcherModId);
     }
 
-    private static bool IsSatisfiedPostfix(bool result, ModDependency __instance)
-    {
+    private static bool IsSatisfiedPostfix(bool result, ModDependency __instance) {
         return result ||
                __instance.packageId.ToLowerInvariant() == PrepatcherMod.HarmonyModId &&
                ModLister.GetActiveModWithIdentifier(PrepatcherMod.PrepatcherModId, ignorePostfix: true) != null;

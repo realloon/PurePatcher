@@ -4,10 +4,8 @@ using Verse;
 
 namespace Prepatcher;
 
-internal static partial class HarmonyPatches
-{
-    internal static void AddVerboseProfiling()
-    {
+internal static partial class HarmonyPatches {
+    internal static void AddVerboseProfiling() {
         harmony.Patch(
             typeof(ModLister).GetMethod("RebuildModList"),
             prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(ProfilingPrefix)),

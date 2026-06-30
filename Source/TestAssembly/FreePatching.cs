@@ -6,11 +6,9 @@ using TestAssemblyTarget;
 
 namespace Tests;
 
-public static class FreePatching
-{
+public static class FreePatching {
     [FreePatch]
-    static void RewriteAssembly(ModuleDefinition module)
-    {
+    static void RewriteAssembly(ModuleDefinition module) {
         var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}");
         var method = type.FindMethod(nameof(RewriteTarget.Method));
 
@@ -20,8 +18,7 @@ public static class FreePatching
     }
 
     [FreePatchAll]
-    static bool RewriteAllAssemblies(ModuleDefinition module)
-    {
+    static bool RewriteAllAssemblies(ModuleDefinition module) {
         var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}");
         if (type == null) return false;
 

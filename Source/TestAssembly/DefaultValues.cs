@@ -3,8 +3,7 @@ using TestAssemblyTarget;
 
 namespace Tests;
 
-public static class DefaultValues
-{
+public static class DefaultValues {
     // bool defaults
     [PrepatcherField]
     [DefaultValue(false)]

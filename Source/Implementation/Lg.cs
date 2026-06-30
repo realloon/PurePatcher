@@ -1,7 +1,6 @@
 ﻿namespace Prepatcher;
 
-internal static class Lg
-{
+internal static class Lg {
     internal static Action<object>? _infoFunc;
     internal static Action<object>? _errorFunc;
     internal static Action<object>? _verboseFunc;

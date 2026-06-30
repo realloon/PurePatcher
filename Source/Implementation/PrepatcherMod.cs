@@ -5,24 +5,20 @@ using Verse;
 
 namespace Prepatcher;
 
-internal class PrepatcherMod : Mod
-{
+internal class PrepatcherMod : Mod {
     private const string CmdArgVerbose = "verbose";
 
     internal const string PrepatcherModId = "zetrith.prepatcher";
     internal const string HarmonyModId = "brrainz.harmony";
 
-    public PrepatcherMod(ModContentPack content) : base(content)
-    {
+    public PrepatcherMod(ModContentPack content) : base(content) {
         InitLg();
 
         HarmonyPatches.PatchModLoading();
         HarmonyPatches.AddVerboseProfiling();
 
-        if (DataStore.startedOnce)
-        {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (sender, args) =>
-            {
+        if (DataStore.startedOnce) {
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (sender, args) => {
                 Lg.Verbose($"ReflectionOnlyAssemblyResolve: {args.RequestingAssembly} requested {args.Name}");
                 return null;
             };
@@ -43,8 +39,7 @@ internal class PrepatcherMod : Mod
         Thread.CurrentThread.Abort();
     }
 
-    private static void InitLg()
-    {
+    private static void InitLg() {
         Lg._infoFunc = msg => Log.Message($"Prepatcher: {msg}");
         Lg._errorFunc = msg => Log.Error($"Prepatcher Error: {msg}");
 
@@ -52,8 +47,7 @@ internal class PrepatcherMod : Mod
             Lg._verboseFunc = msg => Log.Message($"Prepatcher Verbose: {msg}");
     }
 
-    public override string SettingsCategory()
-    {
+    public override string SettingsCategory() {
         return "Prepatcher";
     }
 }

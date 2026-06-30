@@ -4,8 +4,7 @@ using TestAssemblyTarget;
 
 namespace Tests;
 
-public static class BadFields
-{
+public static class BadFields {
     [PrepatcherField]
     private static extern ref T FailGenericMethod<T>(TargetClass target);
 

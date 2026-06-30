@@ -6,9 +6,9 @@ using HarmonyLib;
 
 namespace Prepatcher;
 
-internal class UnsafeAssembly
-{
-    private static readonly FieldInfo? MonoAssemblyField = AccessTools.Field(AccessTools.TypeByName("System.Reflection.RuntimeAssembly"), "_mono_assembly");
+internal class UnsafeAssembly {
+    private static readonly FieldInfo? MonoAssemblyField =
+        AccessTools.Field(AccessTools.TypeByName("System.Reflection.RuntimeAssembly"), "_mono_assembly");
 
     private static List<Assembly> refOnly = new();
 
@@ -19,8 +19,7 @@ internal class UnsafeAssembly
     // This sets the assembly-to-be-duplicated as ReflectionOnly to
     // make sure it is skipped by the internal assembly searcher during loading.
     // That allows for the duplication to happen.
-    internal static unsafe void SetReflectionOnly(Assembly asm, bool value)
-    {
+    internal static unsafe void SetReflectionOnly(Assembly asm, bool value) {
         // Silently skip on non-Mono runtimes
         if (MonoAssemblyField == null)
             return;
@@ -34,14 +33,12 @@ internal class UnsafeAssembly
     }
 
     // Used for error recovery
-    internal static void UnsetRefonlys()
-    {
+    internal static void UnsetRefonlys() {
         foreach (var asm in refOnly.ToList())
             SetReflectionOnly(asm, false);
     }
 
-    internal static unsafe byte[] GetRawData(Assembly asm)
-    {
+    internal static unsafe byte[] GetRawData(Assembly asm) {
         if (MonoAssemblyField == null)
             throw new Exception("Not available on non-Mono runtime");
 

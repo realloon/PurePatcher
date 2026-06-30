@@ -3,7 +3,6 @@
 
 namespace DataAssembly;
 
-public static class DataStore
-{
+public static class DataStore {
     public static bool startedOnce;
 }

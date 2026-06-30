@@ -2,6 +2,4 @@
 
 namespace Prepatcher;
 
-public class WorldCameraDriver2 : WorldCameraDriver
-{
-}
+public class WorldCameraDriver2 : WorldCameraDriver { }

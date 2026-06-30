@@ -7,12 +7,11 @@ using MonoMod.Utils;
 
 namespace Prepatcher.Process;
 
-internal partial class FieldAdder
-{
-    private Dictionary<(TypeDefinition targetType, TypeDefinition compType), (MethodDefinition initMethod, FieldDefinition listField)> injectionSites = new();
+internal partial class FieldAdder {
+    private Dictionary<(TypeDefinition targetType, TypeDefinition compType), (MethodDefinition initMethod,
+        FieldDefinition listField)> injectionSites = new();
 
-    internal void RegisterInjection(Type targetType, Type compType, string initMethod, string listField)
-    {
+    internal void RegisterInjection(Type targetType, Type compType, string initMethod, string listField) {
         RegisterInjection(
             set.ReflectionToCecil(targetType),
             set.ReflectionToCecil(compType),
@@ -21,8 +20,8 @@ internal partial class FieldAdder
         );
     }
 
-    internal void RegisterInjection(TypeDefinition targetType, TypeDefinition compType, string initMethod, string listFieldName)
-    {
+    internal void RegisterInjection(TypeDefinition targetType, TypeDefinition compType, string initMethod,
+        string listFieldName) {
         var method = targetType.Methods.FirstOrDefault(m => m.Name == initMethod);
         if (method == null)
             throw new Exception($"Injection site {targetType}:{initMethod} not found");
@@ -40,8 +39,7 @@ internal partial class FieldAdder
         );
     }
 
-    private void PatchInjectionSite(MethodDefinition accessor, FieldDefinition newField)
-    {
+    private void PatchInjectionSite(MethodDefinition accessor, FieldDefinition newField) {
         Lg.Verbose("Patching the component initialization site for injection");
 
         // ldtoken newfield
@@ -61,8 +59,7 @@ internal partial class FieldAdder
         body.Instructions.Insert(3, Instruction.Create(
             OpCodes.Call,
             new GenericInstanceMethod(initMethod.Module.ImportReference(
-                AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.Clear))))
-            {
+                AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.Clear)))) {
                 GenericArguments = { newField.DeclaringType, newField.FieldType }
             }
         ));
@@ -79,8 +76,7 @@ internal partial class FieldAdder
         body.GetILProcessor().Emit(
             OpCodes.Call,
             new GenericInstanceMethod(initMethod.Module.ImportReference(
-                AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.TryInject))))
-            {
+                AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.TryInject)))) {
                 GenericArguments = { newField.DeclaringType, newField.FieldType }
             }
         );
@@ -90,8 +86,7 @@ internal partial class FieldAdder
 
     // Find the unique (component owner type, component type) pair for this accessor and then
     // return the corresponding injection site
-    private (MethodDefinition, FieldDefinition)? GetInjectionSite(MethodDefinition accessor)
-    {
+    private (MethodDefinition, FieldDefinition)? GetInjectionSite(MethodDefinition accessor) {
         var fieldTarget = FirstParameterTypeResolved(accessor)!;
 
         // (field target or its base, field type or its base)
@@ -104,8 +99,8 @@ internal partial class FieldAdder
         possibleTypes = possibleTypes.Concat(
             from targetType in
                 injectionSites.Keys
-                .Select(p => p.targetType)
-                .Where(t => t != fieldTarget && t.BaseTypesAndSelfResolved().Contains(fieldTarget))
+                    .Select(p => p.targetType)
+                    .Where(t => t != fieldTarget && t.BaseTypesAndSelfResolved().Contains(fieldTarget))
             from fieldType in FieldType(accessor).Resolve().BaseTypesAndSelfResolved()
             select (targetType, fieldType)
         );
@@ -118,8 +113,7 @@ internal partial class FieldAdder
         return injectionSites[siteId];
     }
 
-    private static bool HasInjection(MethodDefinition accessor)
-    {
+    private static bool HasInjection(MethodDefinition accessor) {
         return accessor.HasCustomAttribute(typeof(InjectComponentAttribute).FullName);
     }
 }
