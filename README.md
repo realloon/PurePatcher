@@ -16,8 +16,6 @@ For mod projects, reference the annotations package:
 <PackageReference Include="PurePatcher.Annotations" Version="1.0.0" PrivateAssets="all" />
 ```
 
-The package is compile-time only. Players still need the PurePatcher mod installed.
-
 Declare the mod dependency in `About.xml`:
 
 ```xml
