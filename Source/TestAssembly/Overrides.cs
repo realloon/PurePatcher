@@ -5,10 +5,10 @@ namespace Tests;
 
 public static class Overrides {
     [PurePatcherOverride]
-    public static int IntNonVirtual(OverrideMid obj) => obj.IntNonVirtual();
+    public static int IntNonVirtual(OverrideMid obj) => OverrideBase.IntNonVirtual();
 
     [PurePatcherOverride]
-    public static int IntNonVirtualArg(OverrideMid obj, int a) => obj.IntNonVirtualArg(a);
+    public static int IntNonVirtualArg(OverrideMid obj, int a) => OverrideBase.IntNonVirtualArg(a);
 
     [PurePatcherOverride]
     public static int IntVirtual(OverrideMid obj) => obj.IntVirtual();
@@ -17,6 +17,6 @@ public static class Overrides {
 public class OverrideSub : OverrideMid {
     [PurePatcherOverride]
     public new int IntNonVirtualArg_Instance(int a) {
-        return base.IntNonVirtualArg_Instance(a) + 1;
+        return OverrideBase.IntNonVirtualArg_Instance(a) + 1;
     }
 }

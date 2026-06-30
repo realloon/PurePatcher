@@ -15,13 +15,13 @@ public static class BadFields {
     private static extern ref int FailConcreteGeneric(TargetGeneric<int> target);
 
     [PurePatcherField]
-    private static extern ref int FailGenericCount<T, U>(TargetGeneric<T> target);
+    private static extern ref int FailGenericCount<T, TU>(TargetGeneric<T> target);
 
     [PurePatcherField]
     private static extern ref int FailGenericsDontMatch<T>(TargetGeneric3<T, T, T> target);
 
     [PurePatcherField]
-    private static extern ref int FailGenericsDontMatch<T, U, W>(TargetGeneric3<T, W, U> target);
+    private static extern ref int FailGenericsDontMatch<T, TU, TW>(TargetGeneric3<T, TW, TU> target);
 
     // The parameter type is List because it isn't resolvable in the test environment
     // (System assembly isn't provided)

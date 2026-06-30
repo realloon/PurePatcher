@@ -12,9 +12,11 @@ public static class FreePatching {
         var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}");
         var method = type.FindMethod(nameof(RewriteTarget.Method));
 
-        foreach (var inst in method.Body.Instructions)
-            if (inst.OpCode == OpCodes.Ldc_I4_0)
+        foreach (var inst in method.Body.Instructions) {
+            if (inst.OpCode == OpCodes.Ldc_I4_0) {
                 inst.OpCode = OpCodes.Ldc_I4_1;
+            }
+        }
     }
 
     [FreePatchAll]
@@ -24,9 +26,11 @@ public static class FreePatching {
 
         var method = type.FindMethod(nameof(RewriteTarget.Method2));
 
-        foreach (var inst in method.Body.Instructions)
-            if (inst.Operand is "a")
+        foreach (var inst in method.Body.Instructions) {
+            if (inst.Operand is "a") {
                 inst.Operand = "b";
+            }
+        }
 
         return true;
     }

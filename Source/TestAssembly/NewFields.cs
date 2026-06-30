@@ -14,11 +14,13 @@ public static class NewFields {
     [PurePatcherField]
     private static extern ref List<T> MyList<T>(this TargetGeneric<T> target);
 
-    [PurePatcherField]
-    private static extern ref (T, W, U) MyTriple<T, U, W>(this TargetGeneric3<T, U, W> b);
+    extension<T, TU, TW>(TargetGeneric3<T, TU, TW> b) {
+        [PurePatcherField]
+        private extern ref (T, TW, TU) MyTriple();
 
-    [PurePatcherField]
-    private static extern ref (T, T) MyPair<T, U, W>(this TargetGeneric3<T, U, W> b);
+        [PurePatcherField]
+        private extern ref (T, T) MyPair();
+    }
 
     public static int TestIntField(int i) {
         var obj = new TargetClass();

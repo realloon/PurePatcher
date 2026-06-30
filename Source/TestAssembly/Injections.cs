@@ -4,25 +4,29 @@ using TestAssemblyTarget;
 namespace Tests;
 
 public static class Injections {
-    [PurePatcherField]
-    [InjectComponent]
-    private static extern OtherComp SomeComp(this BaseWithComps target);
+    extension(BaseWithComps target) {
+        [PurePatcherField]
+        [InjectComponent]
+        private extern OtherComp SomeComp();
 
-    [PurePatcherField]
-    [InjectComponent]
-    private static extern DerivedMyComponent MyComp(this BaseWithComps target);
+        [PurePatcherField]
+        [InjectComponent]
+        private extern DerivedMyComponent MyComp();
 
-    [PurePatcherField]
-    [InjectComponent]
-    private static extern MyComponent MyCompBase(this BaseWithComps target);
+        [PurePatcherField]
+        [InjectComponent]
+        private extern MyComponent MyCompBase();
+    }
 
-    [PurePatcherField]
-    [InjectComponent]
-    private static extern DerivedMyComponent MyCompOnSubType(this DerivedWithComps target);
+    extension(DerivedWithComps target) {
+        [PurePatcherField]
+        [InjectComponent]
+        private extern DerivedMyComponent MyCompOnSubType();
 
-    [PurePatcherField]
-    [InjectComponent]
-    private static extern MyComponent MyCompBaseOnSubType(this DerivedWithComps target);
+        [PurePatcherField]
+        [InjectComponent]
+        private extern MyComponent MyCompBaseOnSubType();
+    }
 
     [PurePatcherField]
     [InjectComponent]

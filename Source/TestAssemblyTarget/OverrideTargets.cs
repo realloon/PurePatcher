@@ -1,7 +1,7 @@
 namespace TestAssemblyTarget;
 
 public class OverrideBase {
-    public int IntNonVirtual() {
+    public static int IntNonVirtual() {
         return 1;
     }
 
@@ -9,7 +9,7 @@ public class OverrideBase {
         return 1;
     }
 
-    public int IntNonVirtualArg(int a) {
+    public static int IntNonVirtualArg(int a) {
         return a;
     }
 
@@ -17,7 +17,7 @@ public class OverrideBase {
         return 1;
     }
 
-    public int IntNonVirtualArg_Instance(int a) {
+    protected static int IntNonVirtualArg_Instance(int a) {
         return a;
     }
 }

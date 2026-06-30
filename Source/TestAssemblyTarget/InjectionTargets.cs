@@ -11,7 +11,7 @@ public class OtherComp : BaseComp;
 public class InjectionBase;
 
 public class BaseWithComps : InjectionBase {
-    public List<BaseComp> comps = [];
+    public readonly List<BaseComp> comps = [];
     public Type[] compTypes;
 
     public void InitComps() {

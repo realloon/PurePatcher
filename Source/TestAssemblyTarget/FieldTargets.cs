@@ -2,18 +2,14 @@ namespace TestAssemblyTarget;
 
 public class TargetClass;
 
-public class SecondTargetClass {
-    public readonly TargetClass inner;
-
-    public SecondTargetClass(TargetClass inner) {
-        this.inner = inner;
-    }
+public class SecondTargetClass(TargetClass inner) {
+    public readonly TargetClass inner = inner;
 }
 
 public struct TargetStruct;
 
 public class TargetGeneric<T>;
 
-public class TargetGeneric3<T, U, W>;
+public class TargetGeneric3<T, TU, TW>;
 
 public interface ITarget;
