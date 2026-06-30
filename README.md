@@ -13,7 +13,7 @@ Install PurePatcher as a RimWorld mod. Harmony must be loaded before PurePatcher
 For mod projects, reference the annotations package:
 
 ```xml
-<PackageReference Include="PurePatcher.Annotations" Version="<version>" PrivateAssets="all" />
+<PackageReference Include="PurePatcher.Annotations" Version="1.0.0" PrivateAssets="all" />
 ```
 
 The package is compile-time only. Players still need the PurePatcher mod installed.
