@@ -118,4 +118,48 @@ public static class DefaultValues {
     public static SecondTargetClass ObjectThisInitializer(TargetClass obj) => new(obj);
 
     public static int CounterInitializer(DerivedCtorsClass ctors) => ++ctors.counter;
+
+    public static object?[] TestDefaultValues() {
+        var target = new TargetClass();
+        return [
+            target.MyBoolDefaultFalse(),
+            target.MyBoolDefaultTrue(),
+            target.MyIntDefaultMin(),
+            target.MyIntDefaultMax(),
+            target.MyIntDefaultNull(),
+            target.MyUIntDefaultMin(),
+            target.MyUIntDefaultMax(),
+            target.MyUIntDefaultNull(),
+            target.MyLongDefaultMin(),
+            target.MyLongDefaultMax(),
+            target.MyLongDefaultNull(),
+            target.MyULongDefaultMin(),
+            target.MyULongDefaultMax(),
+            target.MyULongDefaultNull(),
+            target.MyFloatDefaultMin(),
+            target.MyFloatDefaultMax(),
+            target.MyFloatDefaultNull(),
+            target.MyDoubleDefaultMin(),
+            target.MyDoubleDefaultMax(),
+            target.MyDoubleDefaultNull(),
+            target.MyStringDefault(),
+            target.MyStringDefaultNull()
+        ];
+    }
+
+    public static object?[] TestDefaultValueInitializers() {
+        var target = new TargetClass();
+        return [
+            target.MyIntParameterless(),
+            target.MyIntFromThis(),
+            ReferenceEquals(target.MyObjectFromThis().inner, target),
+            ReferenceEquals(target.MyObjectFromThis(), target.MyObjectFromThis()),
+            new DerivedCtorsClass().MyIntCounter(),
+            new DerivedCtorsClass(1).MyIntCounter(),
+            new DerivedCtorsClass(0, 0).MyIntCounter(),
+            new DerivedCtorsClass(1, 0).MyIntCounter(),
+            new DerivedCtorsClass(2, 0).MyIntCounter(),
+            new DerivedCtorsClass("a").MyIntCounter()
+        ];
+    }
 }

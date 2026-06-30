@@ -7,10 +7,14 @@ using TestAssemblyTarget;
 namespace Tests;
 
 public static class FreePatching {
+    public static int TestRewriteTargetMethod() => new RewriteTarget().Method();
+
+    public static string TestRewriteTargetMethod2() => new RewriteTarget().Method2();
+
     [FreePatch]
     static void RewriteAssembly(ModuleDefinition module) {
-        var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}");
-        var method = type.FindMethod(nameof(RewriteTarget.Method));
+        var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}")!;
+        var method = type.FindMethod(nameof(RewriteTarget.Method))!;
 
         foreach (var inst in method.Body.Instructions) {
             if (inst.OpCode == OpCodes.Ldc_I4_0) {
@@ -24,7 +28,7 @@ public static class FreePatching {
         var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}");
         if (type == null) return false;
 
-        var method = type.FindMethod(nameof(RewriteTarget.Method2));
+        var method = type.FindMethod(nameof(RewriteTarget.Method2))!;
 
         foreach (var inst in method.Body.Instructions) {
             if (inst.Operand is "a") {

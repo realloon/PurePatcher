@@ -33,53 +33,53 @@ public static class Injections {
     private static extern MyComponent MyCompBaseOnSuperType(this InjectionBase target);
 
     // Exact comp type, initializer type == target type
-    public static BaseComp TestOtherCompInjection() {
+    public static bool TestOtherCompInjection() {
         var thing = new BaseWithComps { compTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
         thing.InitComps();
-        return thing.SomeComp();
+        return thing.SomeComp() == thing.comps[1];
     }
 
     // Exact comp type, initializer type == target type
-    public static BaseComp TestCompInjection() {
+    public static bool TestCompInjection() {
         var thing = new BaseWithComps { compTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
         thing.InitComps();
-        return thing.MyComp();
+        return thing.MyComp() == thing.comps[0];
     }
 
     // Exact comp type, initializer type == target type
-    public static BaseComp TestCompInjection_DoubleInit() {
+    public static bool TestCompInjection_DoubleInit() {
         var thing = new BaseWithComps { compTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
         thing.InitComps();
         thing.InitComps();
-        return thing.MyComp();
+        return thing.MyComp() == thing.comps[0];
     }
 
     // Sub comp type, initializer type == target type
-    public static BaseComp TestCompBaseInjection() {
+    public static bool TestCompBaseInjection() {
         var thing = new BaseWithComps { compTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
         thing.InitComps();
-        return thing.MyCompBase();
+        return thing.MyCompBase() == thing.comps[0];
     }
 
     // Exact comp type, initializer type == super of target type
-    public static BaseComp TestCompInjectionOnSubType() {
+    public static bool TestCompInjectionOnSubType() {
         var thing = new DerivedWithComps { compTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
         thing.InitComps();
-        return thing.MyCompOnSubType();
+        return thing.MyCompOnSubType() == thing.comps[0];
     }
 
     // Sub comp type, initializer type == super of target type
-    public static BaseComp TestCompBaseInjectionOnSubType() {
+    public static bool TestCompBaseInjectionOnSubType() {
         var thing = new DerivedWithComps { compTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
         thing.InitComps();
-        return thing.MyCompBaseOnSubType();
+        return thing.MyCompBaseOnSubType() == thing.comps[0];
     }
 
     // Exact comp type, initializer type == sub of target type
-    public static BaseComp TestCompInjectionOnSuperType() {
+    public static bool TestCompInjectionOnSuperType() {
         var thing = new DerivedWithComps { compTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
         thing.InitComps();
-        return thing.MyCompBaseOnSuperType();
+        return thing.MyCompBaseOnSuperType() == thing.comps[0];
     }
 }
 

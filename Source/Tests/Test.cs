@@ -5,7 +5,6 @@ using System.Reflection;
 using Mono.Cecil;
 using PurePatcher;
 using PurePatcher.Process;
-using TestAssemblyTarget;
 using Tests.Helpers;
 
 namespace Tests;
@@ -22,42 +21,44 @@ internal class Test {
             throw new LogErrorException($"{msg}");
         };
 
-        var liveTestAsm = LoadLiveAsms();
+        var liveAsms = LoadLiveAsms();
 
         set = new AssemblySet();
         fieldAdder = new FieldAdder(set);
 
-        var targetAsm = set.AddAssembly("Test", "TestAssemblyTarget.dll", "TestAssemblyTarget.dll", null);
+        var targetAsm = set.AddAssembly("Test", "TestAssemblyTarget.dll", AssemblyPath("TestAssemblyTarget.dll"), null);
         targetAsm.ProcessAttributes = true;
+        targetAsm.SourceAssembly = liveAsms.Target;
 
-        testAsm = set.AddAssembly("Test", "TestAssembly.dll", "TestAssembly.dll", null);
+        testAsm = set.AddAssembly("Test", "TestAssembly.dll", AssemblyPath("TestAssembly.dll"), null);
         testAsm.ProcessAttributes = true;
-        testAsm.SourceAssembly = liveTestAsm;
+        testAsm.SourceAssembly = liveAsms.Test;
 
-        var typeThingWithComps =
-            targetAsm.ModuleDefinition.GetType($"{nameof(TestAssemblyTarget)}.{nameof(BaseWithComps)}");
-        var typeThingComp =
-            targetAsm.ModuleDefinition.GetType($"{nameof(TestAssemblyTarget)}.{nameof(BaseComp)}");
+        var typeThingWithComps = targetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseWithComps");
+        var typeThingComp = targetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseComp");
 
         fieldAdder.RegisterInjection(
             typeThingWithComps,
             typeThingComp,
-            nameof(BaseWithComps.InitComps),
-            nameof(BaseWithComps.comps)
+            "InitComps",
+            "comps"
         );
     }
 
     // Load the test assemblies and make them resolvable for freepatch testing
-    private static Assembly LoadLiveAsms() {
+    private static (Assembly Test, Assembly Target) LoadLiveAsms() {
+        const string testAssemblyNewName = "TestAssembly1";
         const string testAssemblyTargetNewName = "TestAssemblyTarget1";
 
-        using var testAsmToBeLive = ModuleDefinition.ReadModule("TestAssembly.dll");
-        using var testTargetAsmToBeLive = ModuleDefinition.ReadModule("TestAssemblyTarget.dll");
+        using var testAsmToBeLive = ModuleDefinition.ReadModule(AssemblyPath("TestAssembly.dll"));
+        using var testTargetAsmToBeLive = ModuleDefinition.ReadModule(AssemblyPath("TestAssemblyTarget.dll"));
         Assembly liveTestAsm;
         Assembly liveTargetAsm;
 
         // Rename the referenced assembly so it isn't loaded from disk and passes through AssemblyResolve
         {
+            testAsmToBeLive.Name = testAssemblyNewName;
+            testAsmToBeLive.Assembly.Name.Name = testAssemblyNewName;
             testAsmToBeLive.AssemblyReferences.First(a => a.Name == "TestAssemblyTarget").Name =
                 testAssemblyTargetNewName;
 
@@ -87,11 +88,14 @@ internal class Test {
         AppDomain.CurrentDomain.AssemblyResolve +=
             (_, args) => args.Name.StartsWith(testAssemblyTargetNewName) ? liveTargetAsm : null;
 
-        return liveTestAsm;
+        return (liveTestAsm, liveTargetAsm);
     }
 
-    protected static void WriteAssembly(ModifiableAssembly asm) {
-        // Replaces the actual assembly file that will get autoloaded by the runtime
-        File.WriteAllBytes(asm.AsmDefinition.ShortName() + ".dll", asm.Bytes!);
+    protected static void LoadAssembly(ModifiableAssembly asm) {
+        Assembly.Load(asm.Bytes!);
+    }
+
+    private static string AssemblyPath(string fileName) {
+        return Path.Combine(AppContext.BaseDirectory, fileName);
     }
 }
