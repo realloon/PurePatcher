@@ -12,22 +12,22 @@ internal static partial class HarmonyPatches {
         Logger.Verbose("Patching Root methods");
 
         harmony.Patch(
-            Loader.origAsm.GetType("Verse.Root_Play").GetMethod("Start"),
+            Loader.OrigAsm.GetType("Verse.Root_Play").GetMethod("Start"),
             transpiler: new HarmonyMethod(typeof(HarmonyPatches), nameof(EmptyTranspiler))
         );
 
         harmony.Patch(
-            Loader.origAsm.GetType("Verse.Root_Entry").GetMethod("Start"),
+            Loader.OrigAsm.GetType("Verse.Root_Entry").GetMethod("Start"),
             transpiler: new HarmonyMethod(typeof(HarmonyPatches), nameof(EmptyTranspiler))
         );
 
         harmony.Patch(
-            Loader.origAsm.GetType("Verse.Root_Play").GetMethod("Update"),
+            Loader.OrigAsm.GetType("Verse.Root_Play").GetMethod("Update"),
             new HarmonyMethod(typeof(HarmonyPatches), nameof(RootUpdatePrefix))
         );
 
         harmony.Patch(
-            Loader.origAsm.GetType("Verse.Root_Entry").GetMethod("Update"),
+            Loader.OrigAsm.GetType("Verse.Root_Entry").GetMethod("Update"),
             new HarmonyMethod(typeof(HarmonyPatches), nameof(RootUpdatePrefix))
         );
     }
@@ -60,9 +60,9 @@ internal static partial class HarmonyPatches {
         // It's important the components are iterated this way to make sure
         // they are recreated in the correct order.
         foreach (var comp in UnityEngine.Object.FindObjectsOfType<Component>()) {
-            if (comp.GetType().Assembly == Loader.newAsm) continue;
+            if (comp.GetType().Assembly == Loader.NewAsm) continue;
 
-            var translation = Loader.newAsm.GetType(comp.GetType().FullName);
+            var translation = Loader.NewAsm.GetType(comp.GetType().FullName);
             if (translation == null) continue;
 
             try {
@@ -70,7 +70,7 @@ internal static partial class HarmonyPatches {
                 UnityEngine.Object.Destroy(comp);
 
                 Logger.Verbose(
-                    $"Recreated {comp} {newComp.GetType().Assembly == Loader.newAsm} with new type {translation.FullName}");
+                    $"Recreated {comp} {newComp.GetType().Assembly == Loader.NewAsm} with new type {translation.FullName}");
             } catch (Exception e) {
                 Logger.Error($"Exception recreating Unity component {comp}: {e}");
             }

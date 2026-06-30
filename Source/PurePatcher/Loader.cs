@@ -10,8 +10,8 @@ using Verse.Steam;
 namespace PurePatcher;
 
 internal static class Loader {
-    internal static Assembly origAsm;
-    internal static Assembly newAsm;
+    internal static Assembly OrigAsm = null!;
+    internal static Assembly NewAsm = null!;
     internal static volatile bool RestartGame;
 
     internal static void Reload() {
@@ -32,7 +32,7 @@ internal static class Loader {
     }
 
     private static void DoReload() {
-        origAsm = typeof(Game).Assembly;
+        OrigAsm = typeof(Game).Assembly;
 
         var set = new AssemblySet();
         set.AddAssembly("RimWorld", AssemblyCollector.AssemblyCSharp, null, typeof(Game).Assembly);
@@ -79,7 +79,7 @@ internal static class Loader {
 
         var loadedAssembly = Assembly.Load(asm.Bytes);
         if (loadedAssembly.GetName().Name == AssemblyCollector.AssemblyCSharp) {
-            newAsm = loadedAssembly;
+            NewAsm = loadedAssembly;
             AppDomain.CurrentDomain.AssemblyResolve += (_, _) => loadedAssembly;
         }
 
