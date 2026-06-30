@@ -1,19 +1,21 @@
 # Prepatcher
+
 [![Latest API version](https://img.shields.io/nuget/v/Zetrith.Prepatcher?label=Zetrith.Prepatcher)](https://www.nuget.org/packages/Zetrith.Prepatcher)
 
 Structured assembly rewriting library/mod for RimWorld
 
 Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=2934420800
 
-The project has three main logical components:
+The project has two main logical components:
+
 - **Assembly rewriter** - in principle platform-agnostic
 - **Assembly reloader** - specific to the Mono runtime used by RimWorld's Unity version
-- **Mod manager** (named Prestarter) - specific to RimWorld
 
 ## Installation
 
 ### Users
-- Download the mod by clicking *Code* > *Download ZIP* on this repo's main page
+
+- Download the mod by clicking _Code_ > _Download ZIP_ on this repo's main page
 - Unzip in RimWorld's Mods folder
 - Open the game and put Prepatcher first in the mod list. It has no dependencies on other mods.
 
@@ -26,7 +28,6 @@ Prepatcher is a provider of the Harmony library for RimWorld mods and can be use
 
 Having both Prepatcher and the Harmony mod active won't cause any problems.
 
-
 ### Modders
 
 Add the [`Zetrith.Prepatcher`](https://www.nuget.org/packages/Zetrith.Prepatcher) nuget package to your mod's project:
@@ -36,30 +37,34 @@ Add the [`Zetrith.Prepatcher`](https://www.nuget.org/packages/Zetrith.Prepatcher
 Similar to Harmony, the package distributes an API to be used for compiling only and the actual runtime library is installed by the user once using the mod downloaded from here.
 
 To make a RimWorld mod correctly depend on Prepatcher, put this in `About.xml`:
+
 ```xml
 <modDependencies>
-    <li>
-        <packageId>zetrith.prepatcher</packageId>
-        <displayName>Prepatcher</displayName>
-        <steamWorkshopUrl>steam://url/CommunityFilePage/2934420800</steamWorkshopUrl>
-        <downloadUrl>https://github.com/Zetrith/Prepatcher/releases/latest</downloadUrl>
-    </li>
+  <li>
+    <packageId>zetrith.prepatcher</packageId>
+    <displayName>Prepatcher</displayName>
+    <steamWorkshopUrl>steam://url/CommunityFilePage/2934420800</steamWorkshopUrl>
+      <downloadUrl>https://github.com/Zetrith/Prepatcher/releases/latest</downloadUrl>
+  </li>
 </modDependencies>
 ```
 
 Library example (declaring field addition):
+
 ```cs
 [PrepatcherField]
 public static extern ref int MyInt(this TargetClass target);
 ```
+
 For more details and features, see https://github.com/Zetrith/Prepatcher/wiki
 
-
 ## Compiling
+
 Clone anywhere and go to the Source folder. Run `dotnet build` and/or `dotnet test`.
 If you want to run it ingame clone to the Mods folder.
 
 ## Acknowledgments
+
 Thanks to Pardeike for making [Harmony](https://github.com/pardeike/Harmony), 0x0ade for [MonoMod](https://github.com/MonoMod/MonoMod) and jbevain for [Mono.Cecil](https://github.com/jbevain/cecil).
 
 Thanks to [jikulopo](https://github.com/jikulopo) for an early update to RimWorld 1.6.
