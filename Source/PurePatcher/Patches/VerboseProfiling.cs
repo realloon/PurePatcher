@@ -2,17 +2,19 @@ using System.Reflection;
 using HarmonyLib;
 using Verse;
 
+// ReSharper disable InconsistentNaming
+
 namespace PurePatcher.Patches;
 
 internal static partial class HarmonyPatches {
     internal static void AddVerboseProfiling() {
-        harmony.Patch(
+        Harmony.Patch(
             typeof(ModLister).GetMethod("RebuildModList"),
             prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(ProfilingPrefix)),
             postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(ProfilingPostfix))
         );
 
-        harmony.Patch(
+        Harmony.Patch(
             typeof(ModMetaData).GetMethod("Init", BindingFlags.Instance | BindingFlags.NonPublic),
             prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(ProfilingPrefix)),
             postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(ProfilingPostfix))

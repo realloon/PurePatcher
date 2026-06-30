@@ -3,20 +3,22 @@ using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
 using MonoMod.Utils;
-using PurePatcher.Annotations;
 using Verse;
+using PurePatcher.Annotations;
 
 namespace PurePatcher.Patches;
 
 public static class AssemblyLoadingFreePatch {
     [FreePatch]
-    static void ReplaceAssemblyLoading(ModuleDefinition module) {
+    public static void ReplaceAssemblyLoading(ModuleDefinition module) {
         var type = module.GetType($"{nameof(Verse)}.{nameof(ModAssemblyHandler)}");
-        var method = type.FindMethod(nameof(ModAssemblyHandler.ReloadAll));
+        var method = type.FindMethod(nameof(ModAssemblyHandler.ReloadAll)) ??
+                     throw new MissingMethodException(type.FullName, nameof(ModAssemblyHandler.ReloadAll));
 
-        foreach (var inst in method.Body.Instructions)
+        foreach (var inst in method.Body.Instructions) {
             if (inst.Operand is MethodReference { Name: nameof(Assembly.LoadFrom) })
                 inst.Operand = module.ImportReference(typeof(AssemblyLoadingFreePatch).GetMethod(nameof(LoadFrom)));
+        }
     }
 
     public static Assembly LoadFrom(string filePath) {
@@ -24,18 +26,16 @@ public static class AssemblyLoadingFreePatch {
         var asmWithName = AppDomain.CurrentDomain.GetAssemblies()
             .FirstOrDefault(a => a.GetName().Name == asmName.Name);
 
-        if (asmWithName != null)
-            return asmWithName;
+        if (asmWithName != null) return asmWithName;
 
         var rawAssembly = File.ReadAllBytes(filePath);
         var fileInfo =
             new FileInfo(Path.Combine(Path.GetDirectoryName(filePath)!, Path.GetFileNameWithoutExtension(filePath)) +
                          ".pdb");
-        if (fileInfo.Exists) {
-            var rawSymbolStore = File.ReadAllBytes(fileInfo.FullName);
-            return AppDomain.CurrentDomain.Load(rawAssembly, rawSymbolStore);
-        }
 
-        return AppDomain.CurrentDomain.Load(rawAssembly);
+        if (!fileInfo.Exists) return AppDomain.CurrentDomain.Load(rawAssembly);
+
+        var rawSymbolStore = File.ReadAllBytes(fileInfo.FullName);
+        return AppDomain.CurrentDomain.Load(rawAssembly, rawSymbolStore);
     }
 }

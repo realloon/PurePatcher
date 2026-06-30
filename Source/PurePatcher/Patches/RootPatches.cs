@@ -11,37 +11,37 @@ internal static partial class HarmonyPatches {
     internal static void PatchRootMethods() {
         Logger.Verbose("Patching Root methods");
 
-        harmony.Patch(
+        Harmony.Patch(
             Loader.OrigAsm.GetType("Verse.Root_Play").GetMethod("Start"),
             transpiler: new HarmonyMethod(typeof(HarmonyPatches), nameof(EmptyTranspiler))
         );
 
-        harmony.Patch(
+        Harmony.Patch(
             Loader.OrigAsm.GetType("Verse.Root_Entry").GetMethod("Start"),
             transpiler: new HarmonyMethod(typeof(HarmonyPatches), nameof(EmptyTranspiler))
         );
 
-        harmony.Patch(
+        Harmony.Patch(
             Loader.OrigAsm.GetType("Verse.Root_Play").GetMethod("Update"),
             new HarmonyMethod(typeof(HarmonyPatches), nameof(RootUpdatePrefix))
         );
 
-        harmony.Patch(
+        Harmony.Patch(
             Loader.OrigAsm.GetType("Verse.Root_Entry").GetMethod("Update"),
             new HarmonyMethod(typeof(HarmonyPatches), nameof(RootUpdatePrefix))
         );
     }
 
-    private static bool rootUpdateRunOnce;
+    private static bool _rootUpdateRunOnce;
 
+    // ReSharper disable once InconsistentNaming
     private static bool RootUpdatePrefix(Root __instance) {
-        if (!Loader.RestartGame)
-            return false;
+        if (!Loader.RestartGame) return false;
 
-        if (!rootUpdateRunOnce) {
+        if (!_rootUpdateRunOnce) {
             // Done to prevent a brief flash of black
             __instance.StartCoroutine(RecreateAtEndOfFrame());
-            rootUpdateRunOnce = true;
+            _rootUpdateRunOnce = true;
         } else {
             RecreateComponents();
         }
@@ -60,9 +60,10 @@ internal static partial class HarmonyPatches {
         // It's important the components are iterated this way to make sure
         // they are recreated in the correct order.
         foreach (var comp in UnityEngine.Object.FindObjectsOfType<Component>()) {
-            if (comp.GetType().Assembly == Loader.NewAsm) continue;
+            var compType = comp.GetType();
+            if (compType.Assembly == Loader.NewAsm) continue;
 
-            var translation = Loader.NewAsm.GetType(comp.GetType().FullName);
+            var translation = Loader.NewAsm.GetType(compType.FullName!);
             if (translation == null) continue;
 
             try {
@@ -79,9 +80,5 @@ internal static partial class HarmonyPatches {
 
     private static IEnumerable<CodeInstruction> EmptyTranspiler(IEnumerable<CodeInstruction> _) {
         yield return new CodeInstruction(OpCodes.Ret);
-    }
-
-    private static bool Cancel() {
-        return false;
     }
 }
