@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace PurePatcher;
 
 internal class StopwatchScope : IDisposable {
-    private Stopwatch watch = Stopwatch.StartNew();
+    private readonly Stopwatch watch = Stopwatch.StartNew();
     private string title;
 
     private StopwatchScope() { }
@@ -12,9 +12,7 @@ internal class StopwatchScope : IDisposable {
         Lg.Info($"{title} took {watch.Elapsed.TotalMilliseconds}ms");
     }
 
-    internal static StopwatchScope Measure(string title) {
-        return new StopwatchScope {
-            title = title
-        };
-    }
+    internal static StopwatchScope Measure(string title) => new() {
+        title = title
+    };
 }

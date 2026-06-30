@@ -11,21 +11,17 @@ using MethodImplAttributes = Mono.Cecil.MethodImplAttributes;
 
 namespace PurePatcher.Process;
 
-internal partial class FieldAdder {
-    private readonly AssemblySet set;
-
-    public FieldAdder(AssemblySet set) {
-        this.set = set;
-    }
-
+internal partial class FieldAdder(AssemblySet set) {
     internal void ProcessAllAssemblies() {
-        foreach (var asm in set.AllAssemblies.Where(a => a.ProcessAttributes))
+        foreach (var asm in set.AllAssemblies.Where(a => a.ProcessAttributes)) {
             ProcessTypes(asm.ModuleDefinition.Types);
+        }
     }
 
     internal void ProcessTypes(IEnumerable<TypeDefinition> inTypes) {
-        foreach (var accessor in GetAllPurePatcherFieldAccessors(inTypes))
+        foreach (var accessor in GetAllPurePatcherFieldAccessors(inTypes)) {
             ProcessAccessor(accessor);
+        }
     }
 
     internal void ProcessAccessor(MethodDefinition accessor) {
@@ -112,7 +108,7 @@ internal partial class FieldAdder {
         var fieldType = FieldType(accessor);
         return targetType.Module.ImportReference(
             fieldType,
-            new DummyMethodReference(accessor.Name, targetType.Module.ImportReference(accessor.DeclaringType),
+            DummyMethodReference.Create(accessor.Name, targetType.Module.ImportReference(accessor.DeclaringType),
                 targetType.GenericParameters)
         );
     }
@@ -126,23 +122,26 @@ internal partial class FieldAdder {
     }
 
     internal static IEnumerable<MethodDefinition> GetAllPurePatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes) {
-        return
-            from t in inTypes
-            where t.IsSealed && t.IsAbstract // IsStatic
-            from m in t.Methods
-            where m.HasCustomAttribute(typeof(PurePatcherFieldAttribute).FullName)
-            select m;
+        return inTypes.Where(t => t.IsSealed && t.IsAbstract)
+            .SelectMany(t => t.Methods, (t, m) => new { t, m })
+            .Where(t1 => t1.m.HasCustomAttribute(typeof(PurePatcherFieldAttribute).FullName))
+            .Select(t1 => t1.m);
     }
 }
 
-internal class DummyMethodReference : MethodReference {
-    private readonly Collection<GenericParameter> genericParameters;
-    public override Collection<GenericParameter> GenericParameters => genericParameters;
+internal sealed class DummyMethodReference : MethodReference {
+    public override Collection<GenericParameter> GenericParameters { get; }
 
-    public DummyMethodReference(string name, TypeReference declaringType,
+    private DummyMethodReference(Collection<GenericParameter> genericParameters) {
+        GenericParameters = genericParameters;
+    }
+
+    public static DummyMethodReference Create(string name, TypeReference declaringType,
         Collection<GenericParameter> genericParameters) {
-        Name = name;
-        DeclaringType = declaringType;
-        this.genericParameters = genericParameters;
+        var reference = new DummyMethodReference(genericParameters) {
+            Name = name,
+            DeclaringType = declaringType
+        };
+        return reference;
     }
 }

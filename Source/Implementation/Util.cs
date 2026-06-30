@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections.Generic;
 using Mono.Cecil;
 using System.Runtime.InteropServices;
@@ -6,21 +7,21 @@ using Mono.Cecil.Cil;
 namespace PurePatcher;
 
 internal static class Util {
-    public static string ToStringNullable(this object? o) {
-        return o == null ? "Null" : o.ToString();
-    }
+    [UsedImplicitly]
+    public static string ToStringNullable(this object? o) => o == null ? "Null" : o.ToString();
 
-    public static string ShortName(this AssemblyDefinition asm) {
-        return asm.Name.Name;
-    }
+    public static string ShortName(this AssemblyDefinition asm) => asm.Name.Name;
 
     public static string ManagedFolderOS() {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
             return "Resources/Data/Managed";
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
             return "Managed";
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            return "Managed";
+        }
+
         throw new Exception("Unknown platform");
     }
 
@@ -31,7 +32,7 @@ internal static class Util {
         }
     }
 
-    public static IEnumerable<T> BFS<T>(IEnumerable<T> start, Func<T, IEnumerable<T>> next) {
+    public static IEnumerable<T> Bfs<T>(IEnumerable<T> start, Func<T, IEnumerable<T>> next) {
         var result = new HashSet<T>();
         var todo = new Queue<T>();
 
@@ -42,9 +43,11 @@ internal static class Util {
             var t = todo.Dequeue();
             result.Add(t);
 
-            foreach (var d in next(t))
-                if (!result.Contains(d))
-                    todo.Enqueue(d);
+            foreach (var d in next(t)) {
+                if (result.Contains(d)) continue;
+
+                todo.Enqueue(d);
+            }
         }
 
         return result;

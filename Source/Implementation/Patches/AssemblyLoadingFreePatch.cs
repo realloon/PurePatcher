@@ -1,13 +1,12 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using HarmonyLib;
 using Mono.Cecil;
 using MonoMod.Utils;
 using PurePatcher.Annotations;
 using Verse;
 
-namespace PurePatcher;
+namespace PurePatcher.Patches;
 
 public static class AssemblyLoadingFreePatch {
     [FreePatch]
@@ -35,8 +34,8 @@ public static class AssemblyLoadingFreePatch {
         if (fileInfo.Exists) {
             var rawSymbolStore = File.ReadAllBytes(fileInfo.FullName);
             return AppDomain.CurrentDomain.Load(rawAssembly, rawSymbolStore);
-        } else {
-            return AppDomain.CurrentDomain.Load(rawAssembly);
         }
+
+        return AppDomain.CurrentDomain.Load(rawAssembly);
     }
 }

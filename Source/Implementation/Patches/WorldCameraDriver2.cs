@@ -1,5 +1,5 @@
 using RimWorld.Planet;
 
-namespace PurePatcher;
+namespace PurePatcher.Patches;
 
 public class WorldCameraDriver2 : WorldCameraDriver;

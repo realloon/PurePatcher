@@ -19,8 +19,8 @@ internal class TestBase {
     private Assembly liveTargetAsm;
 
     public virtual void Setup() {
-        Lg._infoFunc = Console.WriteLine;
-        Lg._errorFunc = msg => {
+        Lg.InfoFunc = Console.WriteLine;
+        Lg.ErrorFunc = msg => {
             Console.WriteLine(msg);
             throw new LogErrorException($"{msg}");
         };

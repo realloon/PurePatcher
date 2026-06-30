@@ -14,14 +14,13 @@ internal static class FreePatcher {
         Action<ModifiableAssembly>? callback = null) {
         Lg.Verbose("Running free patches");
 
-        var patcherAssemblies =
-            from a in assemblySet.AllAssemblies
-            where a.ProcessAttributes && a.SourceAssembly != null
-            select a;
+        var patcherAssemblies = assemblySet.AllAssemblies
+            .Where(a => a.ProcessAttributes && a.SourceAssembly != null);
 
         var mainAssembly = assemblySet.FindAssembly(mainAssemblyName);
-        if (mainAssembly == null)
+        if (mainAssembly == null) {
             throw new Exception($"Couldn't find main assembly {mainAssemblyName} in the assembly set");
+        }
 
         foreach (var modifiableAssembly in patcherAssemblies)
         foreach (var patcher in FindAllFreePatches(modifiableAssembly.SourceAssembly!)) {
@@ -29,19 +28,22 @@ internal static class FreePatcher {
             Lg.Verbose($"Running free patch: {patcher.FullDescription()}");
 
             if (IsDefinedSafe<FreePatchAttribute>(patcher)) {
-                if (InvokePatcher(patcher, mainAssembly.ModuleDefinition))
+                if (InvokePatcher(patcher, mainAssembly.ModuleDefinition)) {
                     mainAssembly.Modified = true;
+                }
             } else {
-                foreach (var asmToModify in assemblySet.AllAssemblies)
-                    if (asmToModify.AllowPatches && InvokePatcher(patcher, asmToModify.ModuleDefinition))
-                        asmToModify.Modified = true;
+                foreach (var asmToModify in assemblySet.AllAssemblies) {
+                    if (!asmToModify.AllowPatches || !InvokePatcher(patcher, asmToModify.ModuleDefinition)) continue;
+
+                    asmToModify.Modified = true;
+                }
             }
         }
     }
 
     private static bool InvokePatcher(MethodInfo patcher, ModuleDefinition moduleToPatch) {
         try {
-            var ret = patcher.Invoke(null, new object[] { moduleToPatch });
+            var ret = patcher.Invoke(null, [moduleToPatch]);
             return ret == null || (bool)ret;
         } catch (Exception e) {
             Lg.Error($"Exception running free patch {patcher.FullDescription()}: {e}");
@@ -61,12 +63,9 @@ internal static class FreePatcher {
         }
     }
 
-    private static IEnumerable<MethodInfo> FindAllFreePatches(Assembly patcherAsm) {
-        return
-            from type in patcherAsm.GetTypes()
-            where AccessTools.IsStatic(type)
-            from m in AccessTools.GetDeclaredMethods(type)
-            where IsDefinedSafe<FreePatchAttribute>(m) || IsDefinedSafe<FreePatchAllAttribute>(m)
-            select m;
-    }
+    private static IEnumerable<MethodInfo> FindAllFreePatches(Assembly patcherAsm) => patcherAsm.GetTypes()
+        .Where(AccessTools.IsStatic)
+        .SelectMany(AccessTools.GetDeclaredMethods, (type, m) => new { type, m })
+        .Where(t => IsDefinedSafe<FreePatchAttribute>(t.m) || IsDefinedSafe<FreePatchAllAttribute>(t.m))
+        .Select(t => t.m);
 }

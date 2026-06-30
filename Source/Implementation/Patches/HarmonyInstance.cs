@@ -1,6 +1,6 @@
 using HarmonyLib;
 
-namespace PurePatcher;
+namespace PurePatcher.Patches;
 
 internal static partial class HarmonyPatches {
     private static Harmony harmony = new("purepatcher");

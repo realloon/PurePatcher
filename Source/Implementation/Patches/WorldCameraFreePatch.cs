@@ -4,7 +4,7 @@ using PurePatcher.Annotations;
 using RimWorld.Planet;
 using UnityEngine;
 
-namespace PurePatcher;
+namespace PurePatcher.Patches;
 
 public static class WorldCameraFreePatch {
     [FreePatch]

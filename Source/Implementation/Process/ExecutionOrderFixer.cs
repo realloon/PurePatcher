@@ -23,7 +23,7 @@ internal static class ExecutionOrderFixer {
         };
 
         var attrCtor = asmCSharp.ImportReference(
-            typeof(DefaultExecutionOrder).GetConstructor(new[] { typeof(int) })
+            typeof(DefaultExecutionOrder).GetConstructor([typeof(int)])
         );
 
         foreach (var (t, order) in vanillaOrder) {

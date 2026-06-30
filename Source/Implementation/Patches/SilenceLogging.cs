@@ -2,19 +2,19 @@ using HarmonyLib;
 using UnityEngine;
 using Verse;
 
-namespace PurePatcher;
+namespace PurePatcher.Patches;
 
 internal static partial class HarmonyPatches {
     internal static void SilenceLogging() {
         // Don't print thread abortion errors to log
         harmony.Patch(
-            typeof(Log).GetMethod("Error", new[] { typeof(string) }),
+            typeof(Log).GetMethod("Error", [typeof(string)]),
             new HarmonyMethod(typeof(HarmonyPatches), nameof(LogErrorPrefix))
         );
 
         // Don't show "uninitialized DefOf" warnings in the console
         harmony.Patch(
-            typeof(Log).GetMethod("Warning", new[] { typeof(string) }),
+            typeof(Log).GetMethod("Warning", [typeof(string)]),
             new HarmonyMethod(typeof(HarmonyPatches), nameof(LogWarningPrefix))
         );
     }

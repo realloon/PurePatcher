@@ -5,6 +5,7 @@ namespace PurePatcher.Process;
 public static class InjectionHelper {
     public static void Clear<T, TF>(ref TF? field, object target) {
         if (target is not T) return;
+
         field = default;
     }
 
@@ -12,10 +13,11 @@ public static class InjectionHelper {
         if (target is not T) return;
         if (field != null) return;
 
-        foreach (var comp in comps)
-            if (comp is TF casted) {
-                field = casted;
-                break;
-            }
+        foreach (var comp in comps) {
+            if (comp is not TF casted) continue;
+
+            field = casted;
+            break;
+        }
     }
 }

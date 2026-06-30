@@ -7,8 +7,8 @@ namespace PurePatcher.Process;
 
 // Assumption: there only exists one assembly with a given name (just name, not f.e. name+version pair)
 public class AssemblySet {
-    internal List<ModifiableAssembly> AllAssemblies { get; } = new();
-    private Dictionary<string, ModifiableAssembly> nameToAsm = new();
+    internal List<ModifiableAssembly> AllAssemblies { get; } = [];
+    private readonly Dictionary<string, ModifiableAssembly> nameToAsm = new();
     private IAssemblyResolver Resolver { get; }
 
     public AssemblySet() {
@@ -53,7 +53,7 @@ public class AssemblySet {
             if (refAsm == null) continue;
 
             if (!dependants.TryGetValue(refAsm, out var set))
-                dependants[refAsm] = set = new HashSet<ModifiableAssembly>();
+                dependants[refAsm] = set = [];
 
             set.Add(asm);
         }
@@ -61,13 +61,7 @@ public class AssemblySet {
         return dependants;
     }
 
-    private class AssemblyResolver : IAssemblyResolver {
-        private AssemblySet processor;
-
-        public AssemblyResolver(AssemblySet processor) {
-            this.processor = processor;
-        }
-
+    private class AssemblyResolver(AssemblySet processor) : IAssemblyResolver {
         public AssemblyDefinition? Resolve(AssemblyNameReference name) {
             return processor.FindAssembly(name.Name)?.AsmDefinition;
         }

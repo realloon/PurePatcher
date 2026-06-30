@@ -12,18 +12,19 @@ namespace PurePatcher;
 internal static class Loader {
     internal static Assembly origAsm;
     internal static Assembly newAsm;
-    internal static volatile bool restartGame;
+    internal static volatile bool RestartGame;
 
     internal static void Reload() {
         try {
             Lg.Verbose("Reloading the game");
             DoReload();
 
-            if (GenCommandLine.CommandLineArgPassed("patchandexit"))
+            if (GenCommandLine.CommandLineArgPassed("patchandexit")) {
                 Application.Quit();
+            }
 
             Lg.Info("Done loading");
-            restartGame = true;
+            RestartGame = true;
         } catch (Exception e) {
             Lg.Error($"Fatal error while reloading: {e}");
             throw;
@@ -37,8 +38,7 @@ internal static class Loader {
         set.AddAssembly("RimWorld", AssemblyCollector.AssemblyCSharp, null, typeof(Game).Assembly);
 
         foreach (var (friendlyName, path) in AssemblyCollector.SystemAssemblyPaths()) {
-            if (AssemblyName.GetAssemblyName(path).Name == AssemblyCollector.AssemblyCSharp)
-                continue;
+            if (AssemblyName.GetAssemblyName(path).Name == AssemblyCollector.AssemblyCSharp) continue;
 
             var addedAsm = set.AddAssembly("System", friendlyName, path, null);
             addedAsm.AllowPatches = false;
@@ -52,21 +52,21 @@ internal static class Loader {
 
             var addedAsm = set.AddAssembly(modName, friendlyName, null, asm);
 
-            if (name.EndsWith("DataAssembly"))
+            if (name.EndsWith("DataAssembly")) {
                 addedAsm.AllowPatches = false;
-            else
+            } else {
                 addedAsm.ProcessAttributes = true;
+            }
         }
 
-        using (StopwatchScope.Measure("Game processing"))
-            GameProcessing.Process(set);
+        using (StopwatchScope.Measure("Game processing")) GameProcessing.Process(set);
 
         // Reload the assemblies
         Reloader.Reload(
             set,
             LoadAssembly,
             beforeRefOnlys: () => {
-                HarmonyPatches.PatchRootMethods();
+                Patches.HarmonyPatches.PatchRootMethods();
                 Application.logMessageReceivedThreaded -= Log.Notify_MessageReceivedThreadedInternal;
                 UnregisterWorkshopCallbacks();
                 ClearAssemblyResolve();
@@ -83,10 +83,12 @@ internal static class Loader {
             AppDomain.CurrentDomain.AssemblyResolve += (_, _) => loadedAssembly;
         }
 
-        if (GenCommandLine.TryGetCommandLineArg("dumpasms", out var path) && !path.Trim().NullOrEmpty()) {
-            Directory.CreateDirectory(path);
-            if (asm.Modified)
-                File.WriteAllBytes(Path.Combine(path, asm.AsmDefinition.Name.Name + ".dll"), asm.Bytes!);
+        if (!GenCommandLine.TryGetCommandLineArg("dumpasms", out var path) || path.Trim().NullOrEmpty()) return;
+
+        Directory.CreateDirectory(path);
+
+        if (asm.Modified) {
+            File.WriteAllBytes(Path.Combine(path, asm.AsmDefinition.Name.Name + ".dll"), asm.Bytes!);
         }
     }
 
@@ -107,13 +109,13 @@ internal static class Loader {
 
         // Handle MonoMod's internal dynamic assemblies
         foreach (var d in del.GetInvocationList().ToList()) {
-            if (d!.Method.DeclaringType!.Namespace!.StartsWith("MonoMod.Utils")) {
-                foreach (var f in AccessTools.GetDeclaredFields(d.Method.DeclaringType)) {
-                    if (f.FieldType == typeof(Assembly)) {
-                        var da = (Assembly)f.GetValue(d.Target);
-                        Reloader.setRefonly.Add(da);
-                    }
-                }
+            if (!d!.Method.DeclaringType!.Namespace!.StartsWith("MonoMod.Utils")) continue;
+
+            foreach (var f in AccessTools.GetDeclaredFields(d.Method.DeclaringType)) {
+                if (f.FieldType != typeof(Assembly)) continue;
+
+                var da = (Assembly)f.GetValue(d.Target);
+                Reloader.SetRefonly.Add(da);
             }
         }
 

@@ -9,7 +9,7 @@ using PurePatcher.Annotations;
 namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
-    private Dictionary<(TypeDefinition targetType, TypeDefinition compType), (MethodDefinition initMethod,
+    private readonly Dictionary<(TypeDefinition targetType, TypeDefinition compType), (MethodDefinition initMethod,
         FieldDefinition listField)> injectionSites = new();
 
     internal void RegisterInjection(Type targetType, Type compType, string initMethod, string listField) {

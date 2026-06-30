@@ -2,7 +2,7 @@ using System.Reflection;
 using HarmonyLib;
 using Verse;
 
-namespace PurePatcher;
+namespace PurePatcher.Patches;
 
 internal static partial class HarmonyPatches {
     internal static void AddVerboseProfiling() {

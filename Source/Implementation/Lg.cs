@@ -1,13 +1,13 @@
 namespace PurePatcher;
 
 internal static class Lg {
-    internal static Action<object>? _infoFunc;
-    internal static Action<object>? _errorFunc;
-    internal static Action<object>? _verboseFunc;
+    internal static Action<object>? InfoFunc;
+    internal static Action<object>? ErrorFunc;
+    internal static Action<object>? VerboseFunc;
 
-    internal static void Info(object msg) => _infoFunc?.Invoke(msg);
+    internal static void Info(object msg) => InfoFunc?.Invoke(msg);
 
-    internal static void Error(string msg) => _errorFunc?.Invoke(msg);
+    internal static void Error(string msg) => ErrorFunc?.Invoke(msg);
 
-    internal static void Verbose(string msg) => _verboseFunc?.Invoke(msg);
+    internal static void Verbose(string msg) => VerboseFunc?.Invoke(msg);
 }

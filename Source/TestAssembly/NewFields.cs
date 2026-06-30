@@ -34,7 +34,7 @@ public static class NewFields {
 
     public static string TestGenericField1(string s) {
         var obj = new TargetGeneric<string>();
-        obj.MyList() = new();
+        obj.MyList() = [];
         obj.MyList().Add(s);
         return obj.MyList()[0];
     }

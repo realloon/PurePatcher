@@ -5,7 +5,7 @@ using HarmonyLib;
 using UnityEngine;
 using Verse;
 
-namespace PurePatcher;
+namespace PurePatcher.Patches;
 
 internal static partial class HarmonyPatches {
     internal static void PatchRootMethods() {
@@ -35,7 +35,7 @@ internal static partial class HarmonyPatches {
     private static bool rootUpdateRunOnce;
 
     private static bool RootUpdatePrefix(Root __instance) {
-        if (!Loader.restartGame)
+        if (!Loader.RestartGame)
             return false;
 
         if (!rootUpdateRunOnce) {

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Threading;
 using DataAssembly;
 using UnityEngine;
@@ -5,16 +6,17 @@ using Verse;
 
 namespace PurePatcher;
 
+[UsedImplicitly]
 internal class PurePatcherMod : Mod {
     private const string CmdArgVerbose = "verbose";
 
     public PurePatcherMod(ModContentPack content) : base(content) {
         InitLg();
 
-        HarmonyPatches.AddVerboseProfiling();
+        Patches.HarmonyPatches.AddVerboseProfiling();
 
-        if (DataStore.startedOnce) {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (sender, args) => {
+        if (DataStore.StartedOnce) {
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (_, args) => {
                 Lg.Verbose($"ReflectionOnlyAssemblyResolve: {args.RequestingAssembly} requested {args.Name}");
                 return null;
             };
@@ -23,10 +25,10 @@ internal class PurePatcherMod : Mod {
             return;
         }
 
-        DataStore.startedOnce = true;
+        DataStore.StartedOnce = true;
         Lg.Info($"Starting... (vanilla load took {Time.realtimeSinceStartup}s)");
 
-        HarmonyPatches.SilenceLogging();
+        Patches.HarmonyPatches.SilenceLogging();
         Loader.Reload();
 
         // Thread abortion counts as a crash
@@ -36,11 +38,11 @@ internal class PurePatcherMod : Mod {
     }
 
     private static void InitLg() {
-        Lg._infoFunc = msg => Log.Message($"PurePatcher: {msg}");
-        Lg._errorFunc = msg => Log.Error($"PurePatcher Error: {msg}");
+        Lg.InfoFunc = msg => Log.Message($"PurePatcher: {msg}");
+        Lg.ErrorFunc = msg => Log.Error($"PurePatcher Error: {msg}");
 
         if (GenCommandLine.CommandLineArgPassed(CmdArgVerbose))
-            Lg._verboseFunc = msg => Log.Message($"PurePatcher Verbose: {msg}");
+            Lg.VerboseFunc = msg => Log.Message($"PurePatcher Verbose: {msg}");
     }
 
     public override string SettingsCategory() {

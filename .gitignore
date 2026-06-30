@@ -6,6 +6,7 @@ Assemblies/
 # Source
 **/bin/
 **/obj/
+**.user
 
 # Rider
 Source/.idea/.idea.Prepatcher/.idea/workspace.xml

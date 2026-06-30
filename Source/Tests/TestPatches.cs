@@ -8,11 +8,11 @@ internal class TestPatches : TestBase {
     public override void Setup() {
         base.Setup();
 
-        fieldAdder.ProcessTypes(new[] {
+        fieldAdder.ProcessTypes([
             testAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(NewFields)}"),
             testAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(DefaultValues)}"),
             testAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(Injections)}")
-        });
+        ]);
 
         FreePatcher.RunPatches(set, "TestAssemblyTarget");
         Reloader.Reload(set, WriteAssembly);

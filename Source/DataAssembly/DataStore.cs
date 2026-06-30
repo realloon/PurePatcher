@@ -4,5 +4,5 @@
 namespace DataAssembly;
 
 public static class DataStore {
-    public static bool startedOnce;
+    public static bool StartedOnce;
 }

@@ -18,7 +18,7 @@ internal partial class FieldAdder {
         if (defaultValue == null)
             return;
 
-        ReplaceRetsInCtors(newField.DeclaringType, () => new[] {
+        ReplaceRetsInCtors(newField.DeclaringType, () => [
             Instruction.Create(OpCodes.Ldarg_0),
             Type.GetTypeCode(defaultValue.GetType()) switch {
                 >= TypeCode.Boolean and <= TypeCode.UInt32 => new Instruction(OpCodes.Ldc_I4,
@@ -32,7 +32,7 @@ internal partial class FieldAdder {
             },
             Instruction.Create(OpCodes.Stfld, newField),
             Instruction.Create(OpCodes.Ret)
-        });
+        ]);
     }
 
     private void PatchCtorsWithInitializer(MethodDefinition accessor, FieldDefinition newField,
@@ -42,13 +42,13 @@ internal partial class FieldAdder {
         var initializerMethodName = (string)attribute.ConstructorArguments.First().Value;
         var initializer = accessor.DeclaringType.FindMethod(initializerMethodName);
 
-        ReplaceRetsInCtors(newField.DeclaringType, () => new[] {
+        ReplaceRetsInCtors(newField.DeclaringType, () => [
             Instruction.Create(OpCodes.Ldarg_0),
             Instruction.Create(initializer.Parameters.Count() == 1 ? OpCodes.Ldarg_0 : OpCodes.Nop),
             Instruction.Create(OpCodes.Call, newField.Module.ImportReference(initializer)),
             Instruction.Create(OpCodes.Stfld, newField),
             Instruction.Create(OpCodes.Ret)
-        });
+        ]);
     }
 
     private void ReplaceRetsInCtors(TypeDefinition typeDef, Func<IEnumerable<Instruction>> replacementGetter) {
