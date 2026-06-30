@@ -11,7 +11,7 @@ internal class PurePatcherMod : Mod {
     private const string CmdArgVerbose = "verbose";
 
     public PurePatcherMod(ModContentPack content) : base(content) {
-        InitLg();
+        InitLogger();
 
         Patches.HarmonyPatches.AddVerboseProfiling();
 
@@ -37,7 +37,7 @@ internal class PurePatcherMod : Mod {
         Thread.CurrentThread.Abort();
     }
 
-    private static void InitLg() {
+    private static void InitLogger() {
         Logger.InfoFunc = msg => Log.Message($"PurePatcher: {msg}");
         Logger.ErrorFunc = msg => Log.Error($"PurePatcher Error: {msg}");
 
