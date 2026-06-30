@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
-        <LangVersion>10.0</LangVersion>
-        <Nullable>disable</Nullable>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <RootNamespace>Tests</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
