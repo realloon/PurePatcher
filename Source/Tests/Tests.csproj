@@ -31,7 +31,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Implementation\Implementation.csproj" />
+      <ProjectReference Include="..\PurePatcher\PurePatcher.csproj" />
       <ProjectReference Include="..\TestAssembly\TestAssembly.csproj" />
       <ProjectReference Include="..\TestAssemblyTarget\TestAssemblyTarget.csproj" />
     </ItemGroup>
