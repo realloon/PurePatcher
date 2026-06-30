@@ -9,14 +9,13 @@ using PurePatcher.Annotations;
 namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
-    private void PatchCtorsWithDefault(FieldDefinition newField, CustomAttribute attribute) {
+    private static void PatchCtorsWithDefault(FieldDefinition newField, CustomAttribute attribute) {
         Logger.Verbose("Patching the ctors with field constant default");
 
         var defaultValueObj = attribute.ConstructorArguments.First().Value;
         var defaultValue = defaultValueObj is CustomAttributeArgument arg ? arg.Value : defaultValueObj;
 
-        if (defaultValue == null)
-            return;
+        if (defaultValue == null) return;
 
         ReplaceRetsInCtors(newField.DeclaringType, () => [
             Instruction.Create(OpCodes.Ldarg_0),
@@ -35,12 +34,13 @@ internal partial class FieldAdder {
         ]);
     }
 
-    private void PatchCtorsWithInitializer(MethodDefinition accessor, FieldDefinition newField,
+    private static void PatchCtorsWithInitializer(MethodDefinition accessor, FieldDefinition newField,
         CustomAttribute attribute) {
         Logger.Verbose("Patching the ctors with field initializer");
 
         var initializerMethodName = (string)attribute.ConstructorArguments.First().Value;
-        var initializer = accessor.DeclaringType.FindMethod(initializerMethodName);
+        var initializer = accessor.DeclaringType.FindMethod(initializerMethodName) ??
+                          throw new Exception($"Initializer method {initializerMethodName} not found");
 
         ReplaceRetsInCtors(newField.DeclaringType, () => [
             Instruction.Create(OpCodes.Ldarg_0),
@@ -51,7 +51,7 @@ internal partial class FieldAdder {
         ]);
     }
 
-    private void ReplaceRetsInCtors(TypeDefinition typeDef, Func<IEnumerable<Instruction>> replacementGetter) {
+    private static void ReplaceRetsInCtors(TypeDefinition typeDef, Func<IEnumerable<Instruction>> replacementGetter) {
         foreach (var ctor in typeDef.GetConstructors().Where(c => !c.IsStatic)) {
             if (CallsAThisCtor(ctor)) continue;
 
@@ -61,7 +61,7 @@ internal partial class FieldAdder {
 
             var insts = ctor.Body.Instructions;
 
-            for (int i = insts.Count() - 1; i >= 0; i--) {
+            for (var i = insts.Count() - 1; i >= 0; i--) {
                 var inst = insts.ElementAt(i);
                 if (inst.OpCode != OpCodes.Ret) continue;
 
@@ -74,19 +74,19 @@ internal partial class FieldAdder {
         }
     }
 
-    private static CustomAttribute? GetExplicitDefaultValue(MethodDefinition accessor) {
-        return accessor.GetCustomAttribute(typeof(DefaultValueAttribute).FullName);
-    }
+    private static CustomAttribute? GetExplicitDefaultValue(MethodDefinition accessor) => accessor
+        .GetCustomAttribute(typeof(DefaultValueAttribute).FullName!);
 
-    private static CustomAttribute? GetValueInitializer(MethodDefinition accessor) {
-        return accessor.GetCustomAttribute(typeof(ValueInitializerAttribute).FullName);
-    }
+    private static CustomAttribute? GetValueInitializer(MethodDefinition accessor) => accessor
+        .GetCustomAttribute(typeof(ValueInitializerAttribute).FullName!);
 
     private static bool CallsAThisCtor(MethodDefinition method) {
         foreach (var inst in method.Body.Instructions)
             if (inst.OpCode == OpCodes.Call && inst.Operand is MethodDefinition { IsConstructor: true } m &&
-                m.DeclaringType == method.DeclaringType)
+                m.DeclaringType == method.DeclaringType) {
                 return true;
+            }
+
         return false;
     }
 }

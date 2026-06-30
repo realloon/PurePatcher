@@ -10,7 +10,7 @@ namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
     private readonly Dictionary<(TypeDefinition targetType, TypeDefinition compType), (MethodDefinition initMethod,
-        FieldDefinition listField)> injectionSites = new();
+        FieldDefinition listField)> _injectionSites = new();
 
     internal void RegisterInjection(Type targetType, Type compType, string initMethod, string listField) {
         RegisterInjection(
@@ -24,20 +24,20 @@ internal partial class FieldAdder {
     internal void RegisterInjection(TypeDefinition targetType, TypeDefinition compType, string initMethod,
         string listFieldName) {
         var method = targetType.Methods.FirstOrDefault(m => m.Name == initMethod);
-        if (method == null)
+        if (method == null) {
             throw new Exception($"Injection site {targetType}:{initMethod} not found");
+        }
 
         var listField = targetType.Fields.FirstOrDefault(m => m.Name == listFieldName);
-        if (listField == null)
+        if (listField == null) {
             throw new Exception($"Component list field {targetType}:{listFieldName} not found");
+        }
 
-        if (method.Body.Instructions.Last().OpCode != OpCodes.Ret)
+        if (method.Body.Instructions.Last().OpCode != OpCodes.Ret) {
             throw new Exception($"Expected last instruction of injection site {targetType}:{initMethod} to be Ret");
+        }
 
-        injectionSites[(targetType, compType)] = (
-            method,
-            listField
-        );
+        _injectionSites[(targetType, compType)] = (method, listField);
     }
 
     private void PatchInjectionSite(MethodDefinition accessor, FieldDefinition newField) {
@@ -97,24 +97,18 @@ internal partial class FieldAdder {
             select (targetType, fieldType);
 
         // (supertype of field target, field type or its base)
-        possibleTypes = possibleTypes.Concat(
-            from targetType in
-                injectionSites.Keys
-                    .Select(p => p.targetType)
-                    .Where(t => t != fieldTarget && t.BaseTypesAndSelfResolved().Contains(fieldTarget))
-            from fieldType in FieldType(accessor).Resolve().BaseTypesAndSelfResolved()
-            select (targetType, fieldType)
-        );
+        possibleTypes = possibleTypes.Concat(_injectionSites.Keys.Select(p => p.targetType)
+            .Where(t => t != fieldTarget && t.BaseTypesAndSelfResolved().Contains(fieldTarget))
+            .SelectMany(_ => FieldType(accessor).Resolve().BaseTypesAndSelfResolved(),
+                (targetType, fieldType) => (targetType, fieldType)));
 
         // SingleOrDefault is used to throw on ambiguity
-        var siteId = possibleTypes.SingleOrDefault(p => injectionSites.ContainsKey(p));
-        if (siteId == default)
-            return null;
+        var siteId = possibleTypes.SingleOrDefault(p => _injectionSites.ContainsKey(p));
+        if (siteId == default) return null;
 
-        return injectionSites[siteId];
+        return _injectionSites[siteId];
     }
 
-    private static bool HasInjection(MethodDefinition accessor) {
-        return accessor.HasCustomAttribute(typeof(InjectComponentAttribute).FullName);
-    }
+    private static bool HasInjection(MethodDefinition accessor) => accessor
+        .HasCustomAttribute(typeof(InjectComponentAttribute).FullName!);
 }

@@ -14,10 +14,10 @@ internal static class AssemblyCollector {
         .GetFiles(Path.Combine(Application.dataPath, Util.ManagedFolderOS()), "*.dll")
         .Select(asmPath => ($"(System) {Path.GetFileName(asmPath)}", asmPath)); // Collect System and Unity assemblies
 
-    internal static IEnumerable<(string, string, Assembly)> ModAssemblies() {
+    internal static IEnumerable<(string, Assembly)> ModAssemblies() {
         foreach (var (mod, modAssembly) in GetModAssemblies()) {
             var name = modAssembly.GetName().Name;
-            yield return (mod.Name, $"(mod {mod.PackageIdPlayerFacing}) {name}", modAssembly);
+            yield return ($"(mod {mod.PackageIdPlayerFacing}) {name}", modAssembly);
         }
     }
 

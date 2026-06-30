@@ -15,12 +15,12 @@ public class AssemblySet {
         Resolver = new AssemblyResolver(this);
     }
 
-    public ModifiableAssembly AddAssembly(string ownerName, string friendlyName, string? asmFilePath, Assembly? asm) {
+    public ModifiableAssembly AddAssembly(string friendlyName, string? asmFilePath, Assembly? asm) {
         Logger.Verbose($"Adding assembly {friendlyName}");
 
         var masm = asmFilePath != null
-            ? new ModifiableAssembly(ownerName, friendlyName, asmFilePath, Resolver)
-            : new ModifiableAssembly(ownerName, friendlyName, asm!, Resolver);
+            ? new ModifiableAssembly(friendlyName, asmFilePath, Resolver)
+            : new ModifiableAssembly(friendlyName, asm!, Resolver);
 
         _nameToAsm[masm.AsmDefinition.ShortName()] = masm;
         AllAssemblies.Add(masm);

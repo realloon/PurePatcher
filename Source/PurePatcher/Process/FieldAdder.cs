@@ -127,7 +127,7 @@ internal partial class FieldAdder(AssemblySet set) {
         GetAllPurePatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes) => inTypes
         .Where(t => t.IsSealed && t.IsAbstract)
         .SelectMany(t => t.Methods, (t, m) => new { t, m })
-        .Where(t1 => t1.m.HasCustomAttribute(typeof(PurePatcherFieldAttribute).FullName))
+        .Where(t1 => t1.m.HasCustomAttribute(typeof(PurePatcherFieldAttribute).FullName!))
         .Select(t1 => t1.m);
 }
 

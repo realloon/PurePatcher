@@ -35,22 +35,22 @@ internal static class Loader {
         OrigAsm = typeof(Game).Assembly;
 
         var set = new AssemblySet();
-        set.AddAssembly("RimWorld", AssemblyCollector.AssemblyCSharp, null, typeof(Game).Assembly);
+        set.AddAssembly(AssemblyCollector.AssemblyCSharp, null, typeof(Game).Assembly);
 
         foreach (var (friendlyName, path) in AssemblyCollector.SystemAssemblyPaths()) {
             if (AssemblyName.GetAssemblyName(path).Name == AssemblyCollector.AssemblyCSharp) continue;
 
-            var addedAsm = set.AddAssembly("System", friendlyName, path, null);
+            var addedAsm = set.AddAssembly(friendlyName, path, null);
             addedAsm.AllowPatches = false;
         }
 
-        foreach (var (modName, friendlyName, asm) in AssemblyCollector.ModAssemblies()) {
+        foreach (var (friendlyName, asm) in AssemblyCollector.ModAssemblies()) {
             var name = asm.GetName().Name;
 
             // Don't add system assemblies packaged by mods
             if (set.HasAssembly(name)) continue;
 
-            var addedAsm = set.AddAssembly(modName, friendlyName, null, asm);
+            var addedAsm = set.AddAssembly(friendlyName, null, asm);
 
             if (name.EndsWith("DataAssembly")) {
                 addedAsm.AllowPatches = false;

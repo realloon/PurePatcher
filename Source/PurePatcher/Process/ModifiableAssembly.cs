@@ -5,26 +5,27 @@ using Mono.Cecil;
 namespace PurePatcher.Process;
 
 public class ModifiableAssembly {
-    public string OwnerName { get; }
-    public string FriendlyName { get; }
+    private string FriendlyName { get; }
 
     public Assembly? SourceAssembly { get; set; }
     public AssemblyDefinition AsmDefinition { get; }
     public ModuleDefinition ModuleDefinition => AsmDefinition.MainModule;
 
     public bool ProcessAttributes { get; set; }
-    public bool NeedsReload => needsReload || Modified;
+    public bool NeedsReload => _needsReload || Modified;
     public bool Modified { get; set; }
     public bool AllowPatches { get; set; } = true;
 
     public byte[]? Bytes { get; private set; }
+
     private byte[]? RawBytes { get; }
 
-    private bool needsReload;
+    private bool _needsReload;
 
-    public ModifiableAssembly(string ownerName, string friendlyName, Assembly sourceAssembly,
+    public override string ToString() => FriendlyName;
+
+    public ModifiableAssembly(string friendlyName, Assembly sourceAssembly,
         IAssemblyResolver resolver) {
-        OwnerName = ownerName;
         FriendlyName = friendlyName;
         SourceAssembly = sourceAssembly;
 
@@ -36,8 +37,7 @@ public class ModifiableAssembly {
             });
     }
 
-    public ModifiableAssembly(string ownerName, string friendlyName, string path, IAssemblyResolver resolver) {
-        OwnerName = ownerName;
+    public ModifiableAssembly(string friendlyName, string path, IAssemblyResolver resolver) {
         FriendlyName = friendlyName;
         AsmDefinition = AssemblyDefinition.ReadAssembly(
             path,
@@ -64,10 +64,6 @@ public class ModifiableAssembly {
     }
 
     public void SetNeedsReload() {
-        needsReload = true;
-    }
-
-    public override string ToString() {
-        return FriendlyName;
+        _needsReload = true;
     }
 }

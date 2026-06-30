@@ -26,11 +26,11 @@ internal class Test {
         Set = new AssemblySet();
         FieldAdder = new FieldAdder(Set);
 
-        var targetAsm = Set.AddAssembly("Test", "TestAssemblyTarget.dll", AssemblyPath("TestAssemblyTarget.dll"), null);
+        var targetAsm = Set.AddAssembly("TestAssemblyTarget.dll", AssemblyPath("TestAssemblyTarget.dll"), null);
         targetAsm.ProcessAttributes = true;
         targetAsm.SourceAssembly = liveAsms.Target;
 
-        TestAsm = Set.AddAssembly("Test", "TestAssembly.dll", AssemblyPath("TestAssembly.dll"), null);
+        TestAsm = Set.AddAssembly("TestAssembly.dll", AssemblyPath("TestAssembly.dll"), null);
         TestAsm.ProcessAttributes = true;
         TestAsm.SourceAssembly = liveAsms.Test;
 
