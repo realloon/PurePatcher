@@ -3,16 +3,16 @@ using System.Diagnostics;
 namespace PurePatcher;
 
 internal class StopwatchScope : IDisposable {
-    private readonly Stopwatch watch = Stopwatch.StartNew();
-    private string title;
+    private readonly Stopwatch _watch = Stopwatch.StartNew();
+    private readonly string _title;
 
-    private StopwatchScope() { }
-
-    public void Dispose() {
-        Logger.Info($"{title} took {watch.Elapsed.TotalMilliseconds}ms");
+    private StopwatchScope(string title) {
+        _title = title;
     }
 
-    internal static StopwatchScope Measure(string title) => new() {
-        title = title
-    };
+    public void Dispose() {
+        Logger.Info($"{_title} took {_watch.Elapsed.TotalMilliseconds}ms");
+    }
+
+    internal static StopwatchScope Measure(string title) => new(title);
 }
