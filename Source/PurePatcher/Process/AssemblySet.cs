@@ -8,7 +8,7 @@ namespace PurePatcher.Process;
 // Assumption: there only exists one assembly with a given name (just name, not f.e. name+version pair)
 public class AssemblySet {
     internal List<ModifiableAssembly> AllAssemblies { get; } = [];
-    private readonly Dictionary<string, ModifiableAssembly> nameToAsm = new();
+    private readonly Dictionary<string, ModifiableAssembly> _nameToAsm = new();
     private IAssemblyResolver Resolver { get; }
 
     public AssemblySet() {
@@ -22,17 +22,17 @@ public class AssemblySet {
             ? new ModifiableAssembly(ownerName, friendlyName, asmFilePath, Resolver)
             : new ModifiableAssembly(ownerName, friendlyName, asm!, Resolver);
 
-        nameToAsm[masm.AsmDefinition.ShortName()] = masm;
+        _nameToAsm[masm.AsmDefinition.ShortName()] = masm;
         AllAssemblies.Add(masm);
         return masm;
     }
 
     public bool HasAssembly(string name) {
-        return nameToAsm.ContainsKey(name);
+        return _nameToAsm.ContainsKey(name);
     }
 
     public ModifiableAssembly? FindAssembly(string name) {
-        return nameToAsm.GetValueSafe(name);
+        return _nameToAsm.GetValueSafe(name);
     }
 
     internal ModifiableAssembly? FindAssembly(TypeDefinition typeDef) {
@@ -47,7 +47,7 @@ public class AssemblySet {
     internal Dictionary<ModifiableAssembly, HashSet<ModifiableAssembly>> AllAssembliesToDependants() {
         var dependants = new Dictionary<ModifiableAssembly, HashSet<ModifiableAssembly>>();
 
-        foreach (var asm in nameToAsm.Values)
+        foreach (var asm in _nameToAsm.Values)
         foreach (var reference in asm.ModuleDefinition.AssemblyReferences) {
             var refAsm = FindAssembly(reference.Name);
             if (refAsm == null) continue;

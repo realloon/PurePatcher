@@ -1,15 +1,11 @@
-using JetBrains.Annotations;
 using System.Collections.Generic;
-using Mono.Cecil;
 using System.Runtime.InteropServices;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace PurePatcher;
 
 internal static class Util {
-    [UsedImplicitly]
-    public static string ToStringNullable(this object? o) => o == null ? "Null" : o.ToString();
-
     public static string ShortName(this AssemblyDefinition asm) => asm.Name.Name;
 
     public static string ManagedFolderOS() {

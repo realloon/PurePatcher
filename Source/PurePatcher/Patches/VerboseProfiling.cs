@@ -19,9 +19,8 @@ internal static partial class HarmonyPatches {
         );
     }
 
-    private static void ProfilingPrefix(object __instance, MethodBase __originalMethod)
-        => DeepProfiler.Start(__originalMethod + (__instance is ModMetaData mod ? $" {mod.FolderName}" : ""));
+    private static void ProfilingPrefix(object __instance, MethodBase __originalMethod) => DeepProfiler
+        .Start(__originalMethod + (__instance is ModMetaData mod ? $" {mod.FolderName}" : ""));
 
-    private static void ProfilingPostfix()
-        => DeepProfiler.End();
+    private static void ProfilingPostfix() => DeepProfiler.End();
 }

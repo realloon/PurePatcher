@@ -34,14 +34,17 @@ internal partial class FieldAdder(AssemblySet set) {
         var newField = AddFieldToTarget(accessor);
         PatchAccessor(accessor, newField);
 
-        if (HasInjection(accessor))
+        if (HasInjection(accessor)) {
             PatchInjectionSite(accessor, newField);
+        }
 
-        if (GetExplicitDefaultValue(accessor) is { } attr)
+        if (GetExplicitDefaultValue(accessor) is { } attr) {
             PatchCtorsWithDefault(newField, attr);
+        }
 
-        if (GetValueInitializer(accessor) is { } initializerAttr)
+        if (GetValueInitializer(accessor) is { } initializerAttr) {
             PatchCtorsWithInitializer(accessor, newField, initializerAttr);
+        }
     }
 
     private FieldDefinition AddFieldToTarget(MethodDefinition accessor) {
@@ -97,11 +100,10 @@ internal partial class FieldAdder(AssemblySet set) {
         accessorAsm.Modified = true;
     }
 
-    private static TypeReference FieldType(MethodDefinition accessor) {
-        return accessor.ReturnType.IsByReference
-            ? ((ByReferenceType)accessor.ReturnType).ElementType
-            : accessor.ReturnType;
-    }
+    private static TypeReference FieldType(MethodDefinition accessor) => accessor.ReturnType.IsByReference
+        ? ((ByReferenceType)accessor.ReturnType).ElementType
+        : accessor.ReturnType;
+
 
     private static TypeReference ImportFieldTypeIntoTargetModule(MethodDefinition accessor) {
         var targetType = FirstParameterTypeResolved(accessor)!;
@@ -121,12 +123,12 @@ internal partial class FieldAdder(AssemblySet set) {
         return accessor.DeclaringType.Module.Assembly.ShortName() + accessor.Name + accessor.MetadataToken.RID;
     }
 
-    internal static IEnumerable<MethodDefinition> GetAllPurePatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes) {
-        return inTypes.Where(t => t.IsSealed && t.IsAbstract)
-            .SelectMany(t => t.Methods, (t, m) => new { t, m })
-            .Where(t1 => t1.m.HasCustomAttribute(typeof(PurePatcherFieldAttribute).FullName))
-            .Select(t1 => t1.m);
-    }
+    internal static IEnumerable<MethodDefinition>
+        GetAllPurePatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes) => inTypes
+        .Where(t => t.IsSealed && t.IsAbstract)
+        .SelectMany(t => t.Methods, (t, m) => new { t, m })
+        .Where(t1 => t1.m.HasCustomAttribute(typeof(PurePatcherFieldAttribute).FullName))
+        .Select(t1 => t1.m);
 }
 
 internal sealed class DummyMethodReference : MethodReference {

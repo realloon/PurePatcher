@@ -1,18 +1,12 @@
-using JetBrains.Annotations;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using HarmonyLib;
 
 namespace PurePatcher;
 
-[UsedImplicitly]
-internal class UnsafeAssembly {
+internal static class UnsafeAssembly {
     private static readonly FieldInfo? MonoAssemblyField =
         AccessTools.Field(AccessTools.TypeByName("System.Reflection.RuntimeAssembly"), "_mono_assembly");
-
-    private static readonly List<Assembly> RefOnly = [];
 
     // Loading two assemblies with the same name and version isn't possible with Unity's Mono.
     // It IS possible in .NET and has been fixed in more recent versions of Mono
@@ -30,18 +24,6 @@ internal class UnsafeAssembly {
         }
 
         *(int*)((IntPtr)MonoAssemblyField.GetValue(asm) + 0x74) = value ? 1 : 0;
-
-        if (value) {
-            RefOnly.Add(asm);
-        }
-    }
-
-    // Used for error recovery
-    [UsedImplicitly]
-    internal static void UnsetRefonlys() {
-        foreach (var asm in RefOnly.ToList()) {
-            SetReflectionOnly(asm, false);
-        }
     }
 
     internal static unsafe byte[] GetRawData(Assembly asm) {
