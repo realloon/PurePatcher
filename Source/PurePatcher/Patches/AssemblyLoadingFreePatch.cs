@@ -29,11 +29,11 @@ public static class AssemblyLoadingFreePatch {
         if (asmWithName != null) return asmWithName;
 
         var rawAssembly = File.ReadAllBytes(filePath);
-        var fileInfo =
-            new FileInfo(Path.Combine(Path.GetDirectoryName(filePath)!, Path.GetFileNameWithoutExtension(filePath)) +
-                         ".pdb");
+        var fileInfo = new FileInfo(Path.ChangeExtension(filePath, ".pdb"));
 
-        if (!fileInfo.Exists) return AppDomain.CurrentDomain.Load(rawAssembly);
+        if (!fileInfo.Exists) {
+            return AppDomain.CurrentDomain.Load(rawAssembly);
+        }
 
         var rawSymbolStore = File.ReadAllBytes(fileInfo.FullName);
         return AppDomain.CurrentDomain.Load(rawAssembly, rawSymbolStore);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace TestAssemblyTarget;
 
 public abstract class BaseComp {
-    public BaseWithComps parent;
+    public BaseWithComps Parent = null!;
 }
 
 public class OtherComp : BaseComp;
@@ -11,16 +11,16 @@ public class OtherComp : BaseComp;
 public class InjectionBase;
 
 public class BaseWithComps : InjectionBase {
-    public readonly List<BaseComp> comps = [];
-    public Type[] compTypes;
+    public readonly List<BaseComp> Comps = [];
+    public Type[] CompTypes = null!;
 
     public void InitComps() {
-        comps.Clear();
+        Comps.Clear();
 
-        foreach (var type in compTypes) {
+        foreach (var type in CompTypes) {
             var comp = (BaseComp)Activator.CreateInstance(type);
-            comp.parent = this;
-            comps.Add(comp);
+            comp.Parent = this;
+            Comps.Add(comp);
         }
     }
 }

@@ -1,7 +1,9 @@
+// ReSharper disable UnusedParameter.Local
+
 namespace TestAssemblyTarget;
 
 public class CtorsClass {
-    public int counter;
+    public int Counter;
 
     protected CtorsClass() { }
 

@@ -117,7 +117,7 @@ public static class DefaultValues {
 
     public static SecondTargetClass ObjectThisInitializer(TargetClass obj) => new(obj);
 
-    public static int CounterInitializer(DerivedCtorsClass ctors) => ++ctors.counter;
+    public static int CounterInitializer(DerivedCtorsClass ctors) => ++ctors.Counter;
 
     public static object?[] TestDefaultValues() {
         var target = new TargetClass();
@@ -152,7 +152,9 @@ public static class DefaultValues {
         return [
             target.MyIntParameterless(),
             target.MyIntFromThis(),
-            ReferenceEquals(target.MyObjectFromThis().inner, target),
+            ReferenceEquals(target.MyObjectFromThis().Inner, target),
+            // ReSharper disable once EqualExpressionComparison
+            // Must call twice to verify the initializer stores and reuses the same instance.
             ReferenceEquals(target.MyObjectFromThis(), target.MyObjectFromThis()),
             new DerivedCtorsClass().MyIntCounter(),
             new DerivedCtorsClass(1).MyIntCounter(),

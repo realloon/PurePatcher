@@ -12,7 +12,7 @@ public static class FreePatching {
     public static string TestRewriteTargetMethod2() => new RewriteTarget().Method2();
 
     [FreePatch]
-    static void RewriteAssembly(ModuleDefinition module) {
+    public static void RewriteAssembly(ModuleDefinition module) {
         var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}")!;
         var method = type.FindMethod(nameof(RewriteTarget.Method))!;
 
@@ -24,7 +24,7 @@ public static class FreePatching {
     }
 
     [FreePatchAll]
-    static bool RewriteAllAssemblies(ModuleDefinition module) {
+    public static bool RewriteAllAssemblies(ModuleDefinition module) {
         var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}");
         if (type == null) return false;
 
