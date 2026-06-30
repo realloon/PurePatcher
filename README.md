@@ -47,4 +47,4 @@ dotnet build Source/PurePatcher.slnx
 
 ## Acknowledgments
 
-PurePatcher builds on Harmony, MonoMod, and Mono.Cecil.
+PurePatcher is forked from [Prepatcher](https://github.com/Zetrith/Prepatcher), and builds on Harmony, MonoMod, and Mono.Cecil.
