@@ -6,9 +6,9 @@ public abstract class BaseComp {
     public BaseWithComps parent;
 }
 
-public class OtherComp : BaseComp { }
+public class OtherComp : BaseComp;
 
-public class InjectionBase { }
+public class InjectionBase;
 
 public class BaseWithComps : InjectionBase {
     public List<BaseComp> comps = new();
@@ -25,4 +25,4 @@ public class BaseWithComps : InjectionBase {
     }
 }
 
-public class DerivedWithComps : BaseWithComps { }
+public class DerivedWithComps : BaseWithComps;

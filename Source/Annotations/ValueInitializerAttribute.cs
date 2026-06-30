@@ -6,5 +6,10 @@ namespace PurePatcher.Annotations;
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 public class ValueInitializerAttribute : Attribute {
+    /// <summary>
+    /// Creates an initializer annotation for a PurePatcherField.
+    /// </summary>
+    /// <param name="initializerMethod">The name of the method that supplies the initial field value.</param>
+    // ReSharper disable once UnusedParameter.Local
     public ValueInitializerAttribute(string initializerMethod) { }
 }

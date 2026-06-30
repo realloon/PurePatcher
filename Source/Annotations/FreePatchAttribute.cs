@@ -4,4 +4,4 @@ namespace PurePatcher.Annotations;
 /// Marks an assembly rewriting method
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-public class FreePatchAttribute : Attribute { }
+public class FreePatchAttribute : Attribute;

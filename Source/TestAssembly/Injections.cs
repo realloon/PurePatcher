@@ -79,6 +79,6 @@ public static class Injections {
     }
 }
 
-public class MyComponent : BaseComp { }
+public class MyComponent : BaseComp;
 
-public class DerivedMyComponent : MyComponent { }
+public class DerivedMyComponent : MyComponent;

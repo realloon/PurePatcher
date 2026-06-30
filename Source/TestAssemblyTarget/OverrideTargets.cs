@@ -22,4 +22,4 @@ public class OverrideBase {
     }
 }
 
-public class OverrideMid : OverrideBase { }
+public class OverrideMid : OverrideBase;
