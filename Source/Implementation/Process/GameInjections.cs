@@ -1,7 +1,7 @@
-﻿using RimWorld.Planet;
+using RimWorld.Planet;
 using Verse;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal static class GameInjections {
     internal static void RegisterInjections(FieldAdder fieldAdder) {

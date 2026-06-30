@@ -1,7 +1,7 @@
-﻿namespace Prepatcher;
+namespace PurePatcher.Annotations;
 
 /// <summary>
-/// Specifies the default value of a PrepatcherField
+/// Specifies the default value of a PurePatcherField
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 public class DefaultValueAttribute : Attribute {

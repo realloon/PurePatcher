@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using MonoMod.Utils;
+using PurePatcher.Annotations;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
     private void PatchCtorsWithDefault(FieldDefinition newField, CustomAttribute attribute) {

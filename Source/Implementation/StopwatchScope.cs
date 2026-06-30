@@ -1,6 +1,6 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 internal class StopwatchScope : IDisposable {
     private Stopwatch watch = Stopwatch.StartNew();

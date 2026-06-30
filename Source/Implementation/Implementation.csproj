@@ -8,8 +8,8 @@
         <OutputPath>..\..\Assemblies\</OutputPath>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <RootNamespace>Prepatcher</RootNamespace>
-        <AssemblyName>PrepatcherImpl</AssemblyName>
+        <RootNamespace>PurePatcher</RootNamespace>
+        <AssemblyName>PurePatcher</AssemblyName>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\API\API.csproj" />
+    <ProjectReference Include="..\Annotations\Annotations.csproj" />
     <ProjectReference Include="..\DataAssembly\DataAssembly.csproj" />
   </ItemGroup>
 

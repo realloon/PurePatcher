@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
     private string? CheckFieldAccessor(MethodDefinition accessor) {

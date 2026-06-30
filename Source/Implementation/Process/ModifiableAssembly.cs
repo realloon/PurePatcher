@@ -1,8 +1,8 @@
-﻿using System.IO;
+using System.IO;
 using System.Reflection;
 using Mono.Cecil;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 public class ModifiableAssembly {
     public string OwnerName { get; }

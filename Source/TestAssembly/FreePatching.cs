@@ -1,7 +1,7 @@
-﻿using Mono.Cecil;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Utils;
-using Prepatcher;
+using PurePatcher.Annotations;
 using TestAssemblyTarget;
 
 namespace Tests;

@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using MonoMod.Utils;
+using PurePatcher.Annotations;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
     private Dictionary<(TypeDefinition targetType, TypeDefinition compType), (MethodDefinition initMethod,

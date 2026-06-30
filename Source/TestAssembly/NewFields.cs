@@ -1,23 +1,23 @@
-﻿using System.Collections.Generic;
-using Prepatcher;
+using System.Collections.Generic;
+using PurePatcher.Annotations;
 using TestAssemblyTarget;
 
 namespace Tests;
 
 public static class NewFields {
-    [PrepatcherField]
+    [PurePatcherField]
     private static extern ref int MyInt(this TargetClass target);
 
-    [PrepatcherField]
+    [PurePatcherField]
     private static extern ref int MyIntStruct(this ref TargetStruct target);
 
-    [PrepatcherField]
+    [PurePatcherField]
     private static extern ref List<T> MyList<T>(this TargetGeneric<T> target);
 
-    [PrepatcherField]
+    [PurePatcherField]
     private static extern ref (T, W, U) MyTriple<T, U, W>(this TargetGeneric3<T, U, W> b);
 
-    [PrepatcherField]
+    [PurePatcherField]
     private static extern ref (T, T) MyPair<T, U, W>(this TargetGeneric3<T, U, W> b);
 
     public static int TestIntField(int i) {

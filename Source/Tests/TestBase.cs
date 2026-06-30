@@ -1,9 +1,9 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
-using Prepatcher;
-using Prepatcher.Process;
+using PurePatcher;
+using PurePatcher.Process;
 using TestAssemblyTarget;
 
 namespace Tests;
@@ -64,7 +64,7 @@ internal class TestBase {
 
             // The bodies have to be initialized because the test runtime doesn't seem to like non pinvoke extern methods
             // Mono is fine with them
-            foreach (var m in FieldAdder.GetAllPrepatcherFieldAccessors(testAsmToBeLive.Types))
+            foreach (var m in FieldAdder.GetAllPurePatcherFieldAccessors(testAsmToBeLive.Types))
                 Util.SetEmptyBody(m);
 
             var stream = new MemoryStream();
@@ -76,7 +76,7 @@ internal class TestBase {
             testTargetAsmToBeLive.Name = testAssemblyTargetNewName;
             testTargetAsmToBeLive.Assembly.Name.Name = testAssemblyTargetNewName;
 
-            foreach (var m in FieldAdder.GetAllPrepatcherFieldAccessors(testTargetAsmToBeLive.Types))
+            foreach (var m in FieldAdder.GetAllPurePatcherFieldAccessors(testTargetAsmToBeLive.Types))
                 Util.SetEmptyBody(m);
 
             var stream = new MemoryStream();

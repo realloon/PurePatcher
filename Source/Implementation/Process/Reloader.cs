@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal static class Reloader {
     internal static List<Assembly> setRefonly = new();

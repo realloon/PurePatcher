@@ -1,13 +1,13 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using Prepatcher.Process;
+using PurePatcher.Process;
 using UnityEngine;
 using Verse;
 using Verse.Steam;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 internal static class Loader {
     internal static Assembly origAsm;

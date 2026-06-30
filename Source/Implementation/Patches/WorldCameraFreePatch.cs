@@ -1,9 +1,10 @@
-﻿using Mono.Cecil;
+using Mono.Cecil;
 using MonoMod.Utils;
+using PurePatcher.Annotations;
 using RimWorld.Planet;
 using UnityEngine;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 public static class WorldCameraFreePatch {
     [FreePatch]

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using Mono.Cecil;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 // Assumption: there only exists one assembly with a given name (just name, not f.e. name+version pair)
 public class AssemblySet {

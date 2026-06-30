@@ -1,30 +1,30 @@
-﻿using Prepatcher;
+using PurePatcher.Annotations;
 using TestAssemblyTarget;
 
 namespace Tests;
 
 public static class Injections {
-    [PrepatcherField]
+    [PurePatcherField]
     [InjectComponent]
     private static extern OtherComp SomeComp(this BaseWithComps target);
 
-    [PrepatcherField]
+    [PurePatcherField]
     [InjectComponent]
     private static extern DerivedMyComponent MyComp(this BaseWithComps target);
 
-    [PrepatcherField]
+    [PurePatcherField]
     [InjectComponent]
     private static extern MyComponent MyCompBase(this BaseWithComps target);
 
-    [PrepatcherField]
+    [PurePatcherField]
     [InjectComponent]
     private static extern DerivedMyComponent MyCompOnSubType(this DerivedWithComps target);
 
-    [PrepatcherField]
+    [PurePatcherField]
     [InjectComponent]
     private static extern MyComponent MyCompBaseOnSubType(this DerivedWithComps target);
 
-    [PrepatcherField]
+    [PurePatcherField]
     [InjectComponent]
     private static extern MyComponent MyCompBaseOnSuperType(this InjectionBase target);
 

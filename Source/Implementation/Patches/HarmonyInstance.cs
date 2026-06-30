@@ -1,7 +1,7 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 internal static partial class HarmonyPatches {
-    private static Harmony harmony = new("prepatcher");
+    private static Harmony harmony = new("purepatcher");
 }

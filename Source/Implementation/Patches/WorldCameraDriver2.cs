@@ -1,5 +1,5 @@
-﻿using RimWorld.Planet;
+using RimWorld.Planet;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 public class WorldCameraDriver2 : WorldCameraDriver { }

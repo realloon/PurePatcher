@@ -1,4 +1,4 @@
-﻿namespace Prepatcher;
+namespace PurePatcher;
 
 internal static class Lg {
     internal static Action<object>? _infoFunc;

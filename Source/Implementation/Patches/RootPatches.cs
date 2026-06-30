@@ -1,11 +1,11 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using HarmonyLib;
 using UnityEngine;
 using Verse;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 internal static partial class HarmonyPatches {
     internal static void PatchRootMethods() {

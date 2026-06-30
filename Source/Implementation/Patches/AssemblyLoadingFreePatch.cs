@@ -1,12 +1,13 @@
-﻿using System.IO;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using Mono.Cecil;
 using MonoMod.Utils;
+using PurePatcher.Annotations;
 using Verse;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 public static class AssemblyLoadingFreePatch {
     [FreePatch]

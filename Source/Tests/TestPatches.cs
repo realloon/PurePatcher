@@ -1,4 +1,4 @@
-using Prepatcher.Process;
+using PurePatcher.Process;
 using TestAssemblyTarget;
 
 namespace Tests;

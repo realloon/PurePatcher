@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
 using MonoMod.Utils;
+using PurePatcher.Annotations;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
 using MethodBody = Mono.Cecil.Cil.MethodBody;
 using MethodImplAttributes = Mono.Cecil.MethodImplAttributes;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
     private readonly AssemblySet set;
@@ -23,7 +24,7 @@ internal partial class FieldAdder {
     }
 
     internal void ProcessTypes(IEnumerable<TypeDefinition> inTypes) {
-        foreach (var accessor in GetAllPrepatcherFieldAccessors(inTypes))
+        foreach (var accessor in GetAllPurePatcherFieldAccessors(inTypes))
             ProcessAccessor(accessor);
     }
 
@@ -124,12 +125,12 @@ internal partial class FieldAdder {
         return accessor.DeclaringType.Module.Assembly.ShortName() + accessor.Name + accessor.MetadataToken.RID;
     }
 
-    internal static IEnumerable<MethodDefinition> GetAllPrepatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes) {
+    internal static IEnumerable<MethodDefinition> GetAllPurePatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes) {
         return
             from t in inTypes
             where t.IsSealed && t.IsAbstract // IsStatic
             from m in t.Methods
-            where m.HasCustomAttribute(typeof(PrepatcherFieldAttribute).FullName)
+            where m.HasCustomAttribute(typeof(PurePatcherFieldAttribute).FullName)
             select m;
     }
 }

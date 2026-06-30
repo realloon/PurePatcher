@@ -1,8 +1,8 @@
-﻿using System.Reflection;
+using System.Reflection;
 using HarmonyLib;
 using Verse;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 internal static partial class HarmonyPatches {
     internal static void AddVerboseProfiling() {

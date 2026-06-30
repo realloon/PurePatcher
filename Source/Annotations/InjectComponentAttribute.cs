@@ -1,7 +1,7 @@
-﻿namespace Prepatcher;
+namespace PurePatcher.Annotations;
 
 /// <summary>
-/// Marks a PrepatcherField for automatic injection of components from target class
+/// Marks a PurePatcherField for automatic injection of components from target class
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 public class InjectComponentAttribute : Attribute { }

@@ -1,17 +1,17 @@
-﻿using System.Threading;
+using System.Threading;
 using DataAssembly;
 using UnityEngine;
 using Verse;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
-internal class PrepatcherMod : Mod {
+internal class PurePatcherMod : Mod {
     private const string CmdArgVerbose = "verbose";
 
-    internal const string PrepatcherModId = "zetrith.prepatcher";
+    internal const string PurePatcherModId = "vortex.purepatcher";
     internal const string HarmonyModId = "brrainz.harmony";
 
-    public PrepatcherMod(ModContentPack content) : base(content) {
+    public PurePatcherMod(ModContentPack content) : base(content) {
         InitLg();
 
         HarmonyPatches.PatchModLoading();
@@ -40,14 +40,14 @@ internal class PrepatcherMod : Mod {
     }
 
     private static void InitLg() {
-        Lg._infoFunc = msg => Log.Message($"Prepatcher: {msg}");
-        Lg._errorFunc = msg => Log.Error($"Prepatcher Error: {msg}");
+        Lg._infoFunc = msg => Log.Message($"PurePatcher: {msg}");
+        Lg._errorFunc = msg => Log.Error($"PurePatcher Error: {msg}");
 
         if (GenCommandLine.CommandLineArgPassed(CmdArgVerbose))
-            Lg._verboseFunc = msg => Log.Message($"Prepatcher Verbose: {msg}");
+            Lg._verboseFunc = msg => Log.Message($"PurePatcher Verbose: {msg}");
     }
 
     public override string SettingsCategory() {
-        return "Prepatcher";
+        return "PurePatcher";
     }
 }

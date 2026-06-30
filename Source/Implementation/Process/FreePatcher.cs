@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using Mono.Cecil;
+using PurePatcher.Annotations;
 using ICustomAttributeProvider = System.Reflection.ICustomAttributeProvider;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal static class FreePatcher {
     internal static void RunPatches(AssemblySet assemblySet, string mainAssemblyName,

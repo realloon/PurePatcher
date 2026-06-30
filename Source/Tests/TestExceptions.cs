@@ -1,5 +1,5 @@
-﻿using Mono.Cecil;
-using Prepatcher.Process;
+using Mono.Cecil;
+using PurePatcher.Process;
 
 namespace Tests;
 
@@ -14,7 +14,7 @@ internal class TestExceptions : TestBase {
 
     [Test]
     public void TestBadFieldAccessors() {
-        foreach (var accessor in FieldAdder.GetAllPrepatcherFieldAccessors(TestExtensions.EnumerableOf(typeFail)))
+        foreach (var accessor in FieldAdder.GetAllPurePatcherFieldAccessors(TestExtensions.EnumerableOf(typeFail)))
             Assert.Throws<LogErrorException>(() => { fieldAdder.ProcessAccessor(accessor); }, accessor.Name);
     }
 }

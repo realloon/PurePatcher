@@ -1,4 +1,4 @@
-﻿namespace TestAssemblyTarget;
+namespace TestAssemblyTarget;
 
 public class TargetClass { }
 

@@ -6,16 +6,14 @@
         <Nullable>enable</Nullable>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-        <RootNamespace>Prepatcher</RootNamespace>
-        <AssemblyName>0PrepatcherAPI</AssemblyName>
+        <RootNamespace>PurePatcher.Annotations</RootNamespace>
+        <AssemblyName>PurePatcher.Annotations</AssemblyName>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Authors>Zetrith</Authors>
+        <Authors>Vortex</Authors>
         <Version>1.2.0</Version>
-        <Description>The API for Prepatcher, an assembly rewriting library for RimWorld.</Description>
-        <PackageProjectUrl>https://github.com/Zetrith/Prepatcher</PackageProjectUrl>
+        <Description>Annotations for PurePatcher, a structured assembly rewriting library for RimWorld.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/Zetrith/Prepatcher</RepositoryUrl>
-        <PackageId>Zetrith.Prepatcher</PackageId>
+        <PackageId>PurePatcher.Annotations</PackageId>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
@@ -30,6 +28,4 @@
       <_Parameter1>TestAssembly</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-
-
 </Project>

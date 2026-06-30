@@ -1,6 +1,6 @@
-# Prepatcher
+# PurePatcher
 
-[![Latest API version](https://img.shields.io/nuget/v/Zetrith.Prepatcher?label=Zetrith.Prepatcher)](https://www.nuget.org/packages/Zetrith.Prepatcher)
+[![Latest annotations version](https://img.shields.io/nuget/v/PurePatcher.Annotations?label=PurePatcher.Annotations)](https://www.nuget.org/packages/PurePatcher.Annotations)
 
 Structured assembly rewriting library/mod for RimWorld
 
@@ -17,34 +17,33 @@ The project has two main logical components:
 
 - Download the mod by clicking _Code_ > _Download ZIP_ on this repo's main page
 - Unzip in RimWorld's Mods folder
-- Open the game and put Prepatcher first in the mod list. It has no dependencies on other mods.
+- Open the game and put PurePatcher first in the mod list. It has no dependencies on other mods.
 
 The mod is currently no longer distributed through GitHub's Releases tab.
 
-Prepatcher is a provider of the Harmony library for RimWorld mods and can be used instead of [HarmonyRimWorld](https://github.com/pardeike/HarmonyRimWorld). It patches the mod loading system so that:
+PurePatcher is a provider of the Harmony library for RimWorld mods and can be used instead of [HarmonyRimWorld](https://github.com/pardeike/HarmonyRimWorld). It patches the mod loading system so that:
 
-- `zetrith.prepatcher` (this mod) satisfies dependencies on `brrainz.harmony`
-- Mods needing to load after `brrainz.harmony` also need to load after `zetrith.prepatcher`
+- `Vortex.PurePatcher` (this mod) satisfies dependencies on `brrainz.harmony`
+- Mods needing to load after `brrainz.harmony` also need to load after `Vortex.PurePatcher`
 
-Having both Prepatcher and the Harmony mod active won't cause any problems.
+Having both PurePatcher and the Harmony mod active won't cause any problems.
 
 ### Modders
 
-Add the [`Zetrith.Prepatcher`](https://www.nuget.org/packages/Zetrith.Prepatcher) nuget package to your mod's project:
+Add the `PurePatcher.Annotations` package to your mod's project:
 
-`<PackageReference Include="Zetrith.Prepatcher" Version="<version>" />`
+`<PackageReference Include="PurePatcher.Annotations" Version="<version>" PrivateAssets="all" />`
 
-Similar to Harmony, the package distributes an API to be used for compiling only and the actual runtime library is installed by the user once using the mod downloaded from here.
+Similar to Harmony, the package distributes annotations to be used for compiling only and the actual runtime library is installed by the user once using the mod downloaded from here.
 
-To make a RimWorld mod correctly depend on Prepatcher, put this in `About.xml`:
+To make a RimWorld mod correctly depend on PurePatcher, put this in `About.xml`:
 
 ```xml
 <modDependencies>
   <li>
-    <packageId>zetrith.prepatcher</packageId>
-    <displayName>Prepatcher</displayName>
-    <steamWorkshopUrl>steam://url/CommunityFilePage/2934420800</steamWorkshopUrl>
-      <downloadUrl>https://github.com/Zetrith/Prepatcher/releases/latest</downloadUrl>
+    <packageId>Vortex.PurePatcher</packageId>
+    <displayName>PurePatcher</displayName>
+    <downloadUrl>https://github.com/VortexGaming/PurePatcher</downloadUrl>
   </li>
 </modDependencies>
 ```
@@ -52,11 +51,11 @@ To make a RimWorld mod correctly depend on Prepatcher, put this in `About.xml`:
 Library example (declaring field addition):
 
 ```cs
-[PrepatcherField]
+using PurePatcher.Annotations;
+
+[PurePatcherField]
 public static extern ref int MyInt(this TargetClass target);
 ```
-
-For more details and features, see https://github.com/Zetrith/Prepatcher/wiki
 
 ## Compiling
 

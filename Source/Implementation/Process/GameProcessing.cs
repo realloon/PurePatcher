@@ -1,4 +1,4 @@
-﻿namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal static class GameProcessing {
     internal static void Process(AssemblySet set) {

@@ -3,7 +3,7 @@ using Mono.Cecil;
 using System.Runtime.InteropServices;
 using Mono.Cecil.Cil;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 internal static class Util {
     public static string ToStringNullable(this object? o) {

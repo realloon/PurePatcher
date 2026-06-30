@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="API/API.csproj" />
+  <Project Path="Annotations/Annotations.csproj" />
   <Project Path="DataAssembly/DataAssembly.csproj" />
   <Project Path="Implementation/Implementation.csproj" />
   <Project Path="TestAssembly/TestAssembly.csproj" />

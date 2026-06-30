@@ -2,7 +2,7 @@
 <ModMetaData>
   <packageId>Vortex.PurePatcher</packageId>
   <name>PurePatcher</name>
-  <description>PurePatcher is a structured assembly rewriting library for RimWorld mod developers.\n\nIncludes Harmony v2.4.2 and PrepatcherAPI v1.2.0</description>
+  <description>PurePatcher is a structured assembly rewriting library for RimWorld mod developers.\n\nIncludes Harmony v2.4.2 and PurePatcher.Annotations v1.2.0</description>
   <author>Zetrith, Vortex</author>
   <supportedVersions>
     <li>1.6</li>

@@ -1,4 +1,4 @@
-﻿namespace Prepatcher;
+namespace PurePatcher.Annotations;
 
 /// <summary>
 /// Marks an assembly rewriting method

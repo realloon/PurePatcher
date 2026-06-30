@@ -1,20 +1,20 @@
-﻿using System.Linq;
+using System.Linq;
 using HarmonyLib;
 using Verse;
 
-namespace Prepatcher;
+namespace PurePatcher;
 
 internal static partial class HarmonyPatches {
     internal static void PatchModLoading() {
         Lg.Verbose("Patching mod loading");
 
-        // If a mod needs to loadAfter brrainz.harmony, then also loadAfter zetrith.prepatcher
+        // If a mod needs to loadAfter brrainz.harmony, then also loadAfter vortex.purepatcher
         harmony.Patch(
             typeof(ModMetaData.ModMetaDataInternal).GetMethod("InitVersionedData"),
             postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(InitVersionedDataPostfix))
         );
 
-        // Let Prepatcher satisfy modDependencies on brrainz.harmony
+        // Let PurePatcher satisfy modDependencies on brrainz.harmony
         harmony.Patch(
             typeof(ModDependency).GetProperty("IsSatisfied")!.GetGetMethod(),
             postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(IsSatisfiedPostfix))
@@ -26,14 +26,14 @@ internal static partial class HarmonyPatches {
     }
 
     private static void InitVersionedDataPostfix(ModMetaData.ModMetaDataInternal __instance) {
-        if (__instance.loadAfter.Any(s => s.ToLowerInvariant() == PrepatcherMod.HarmonyModId) &&
-            !__instance.loadAfter.Any(s => s.ToLowerInvariant() == PrepatcherMod.PrepatcherModId))
-            __instance.loadAfter.Add(PrepatcherMod.PrepatcherModId);
+        if (__instance.loadAfter.Any(s => s.ToLowerInvariant() == PurePatcherMod.HarmonyModId) &&
+            !__instance.loadAfter.Any(s => s.ToLowerInvariant() == PurePatcherMod.PurePatcherModId))
+            __instance.loadAfter.Add(PurePatcherMod.PurePatcherModId);
     }
 
     private static bool IsSatisfiedPostfix(bool result, ModDependency __instance) {
         return result ||
-               __instance.packageId.ToLowerInvariant() == PrepatcherMod.HarmonyModId &&
-               ModLister.GetActiveModWithIdentifier(PrepatcherMod.PrepatcherModId, ignorePostfix: true) != null;
+               __instance.packageId.ToLowerInvariant() == PurePatcherMod.HarmonyModId &&
+               ModLister.GetActiveModWithIdentifier(PurePatcherMod.PurePatcherModId, ignorePostfix: true) != null;
     }
 }

@@ -1,11 +1,11 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using Mono.Cecil;
 using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
 
-namespace Prepatcher.Process;
+namespace PurePatcher.Process;
 
 internal static class ExecutionOrderFixer {
     internal static void ApplyExecutionOrderAttributes(ModuleDefinition asmCSharp) {
