@@ -37,6 +37,11 @@ using PurePatcher.Annotations;
 
 [PurePatcherField]
 public static extern ref int MyInt(this TargetClass target);
+
+[ReplaceMethod(typeof(TargetClass), nameof(TargetClass.TargetMethod))]
+public static int TargetMethod(TargetClass target, int value) {
+    return value + 1;
+}
 ```
 
 ## Build

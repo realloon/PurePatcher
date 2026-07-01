@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 namespace PurePatcher.Annotations;
 
 /// <summary>
-/// Replaces a method body with the annotated static method's body.
+/// Replaces the target method body with this method body.
 /// </summary>
 [MeansImplicitUse]
 [AttributeUsage(AttributeTargets.Method, Inherited = false)]
