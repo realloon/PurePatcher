@@ -13,7 +13,7 @@ internal class Test {
     protected AssemblySet Set = null!;
     protected FieldAdder FieldAdder = null!;
     protected ModifiableAssembly TestAsm = null!;
-    private ModifiableAssembly _targetAsm = null!;
+    protected ModifiableAssembly TargetAsm = null!;
 
     public virtual void Setup() {
         Logger.InfoFunc = Console.WriteLine;
@@ -27,16 +27,16 @@ internal class Test {
         Set = new AssemblySet();
         FieldAdder = new FieldAdder(Set);
 
-        _targetAsm = Set.AddAssembly("TestAssemblyTarget.dll", AssemblyPath("TestAssemblyTarget.dll"), null);
-        _targetAsm.ProcessAttributes = true;
-        _targetAsm.SourceAssembly = liveAsms.Target;
+        TargetAsm = Set.AddAssembly("TestAssemblyTarget.dll", AssemblyPath("TestAssemblyTarget.dll"), null);
+        TargetAsm.ProcessAttributes = true;
+        TargetAsm.SourceAssembly = liveAsms.Target;
 
         TestAsm = Set.AddAssembly("TestAssembly.dll", AssemblyPath("TestAssembly.dll"), null);
         TestAsm.ProcessAttributes = true;
         TestAsm.SourceAssembly = liveAsms.Test;
 
-        var typeThingWithComps = _targetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseWithComps");
-        var typeThingComp = _targetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseComp");
+        var typeThingWithComps = TargetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseWithComps");
+        var typeThingComp = TargetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseComp");
 
         FieldAdder.RegisterInjection(
             typeThingWithComps,

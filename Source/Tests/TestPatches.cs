@@ -1,4 +1,8 @@
+using System.Linq;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
 using PurePatcher.Process;
+using TestAssemblyTarget;
 
 namespace Tests;
 
@@ -112,6 +116,30 @@ internal class TestPatches : Test {
         Assert.Multiple(() => {
             Assert.That(MethodReplacement.TestInstanceMethod(), Is.EqualTo(12));
             Assert.That(MethodReplacement.TestStaticMethod(), Is.EqualTo("ab"));
+            Assert.That(MethodReplacement.TestBranchMethod(5), Is.EqualTo(12));
+            Assert.That(MethodReplacement.TestBranchMethod(1), Is.EqualTo(-8));
         });
+    }
+
+    [Test]
+    public void TestMethodReplacementIsInlined() {
+        var method = ReplaceMethodTargetMethod(nameof(ReplaceMethodTarget.InstanceMethod));
+        var replacementCalls = method.Body.Instructions
+            .Select(instruction => instruction.Operand)
+            .OfType<MethodReference>()
+            .Where(reference => reference.DeclaringType.FullName == $"{nameof(Tests)}.{nameof(MethodReplacement)}")
+            .Select(reference => reference.Name)
+            .ToArray();
+
+        Assert.Multiple(() => {
+            Assert.That(replacementCalls, Does.Not.Contain(nameof(MethodReplacement.ReplaceInstanceMethod)));
+            Assert.That(method.Body.Instructions.Any(instruction => instruction.OpCode == OpCodes.Add), Is.True);
+        });
+    }
+
+    private MethodDefinition ReplaceMethodTargetMethod(string methodName) {
+        var type = TargetAsm.ModuleDefinition.GetType(
+            $"{nameof(TestAssemblyTarget)}.{nameof(ReplaceMethodTarget)}");
+        return type.Methods.Single(method => method.Name == methodName);
     }
 }

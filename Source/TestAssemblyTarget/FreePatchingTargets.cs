@@ -12,4 +12,6 @@ public class ReplaceMethodTarget {
     public int InstanceMethod(int value) => value;
 
     public static string StaticMethod(string value) => value;
+
+    public int BranchMethod(int value) => value;
 }
