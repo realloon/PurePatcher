@@ -14,7 +14,7 @@ For mod projects, reference the annotations package:
 
 ```xml
 <ItemGroup>
-    <PackageReference Include="PurePatcher.Annotations" Version="1.1.0" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="PurePatcher.Annotations" Version="1.3.0" PrivateAssets="all" ExcludeAssets="runtime" />
 </ItemGroup>
 ```
 
