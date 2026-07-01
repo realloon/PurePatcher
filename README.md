@@ -2,15 +2,21 @@
 
 [![PurePatcher.Annotations](https://img.shields.io/nuget/v/PurePatcher.Annotations?label=PurePatcher.Annotations)](https://www.nuget.org/packages/PurePatcher.Annotations)
 
-PurePatcher is a RimWorld mod and library for structured assembly rewriting.
+PurePatcher is a library for structured assembly rewriting.
 
-It provides a small annotation package for mod projects, and a runtime mod that applies the requested rewrites in RimWorld.
+It provides an annotation package for mod projects, and a runtime mod that applies the requested rewrites in RimWorld.
+
+## Features
+
+- Add fields to existing game types.
+- Bind and initialize added fields.
+- Replace target method bodies with structured C# methods.
+
+Rewrites are applied only at load time, and patched code has no persistent runtime overhead.
 
 ## Use
 
-Install PurePatcher as a RimWorld mod. Harmony must be loaded before PurePatcher, and PurePatcher must be loaded before Core.
-
-For mod projects, reference the annotations package:
+Add the annotation package to your `.csproj`:
 
 ```xml
 <ItemGroup>
@@ -18,7 +24,9 @@ For mod projects, reference the annotations package:
 </ItemGroup>
 ```
 
-Declare the mod dependency in `About.xml`:
+Like Harmony, PurePatcher requires runtime support from the PurePatcher mod.
+
+Declare the dependency in your `About.xml`:
 
 ```xml
 <modDependencies>
@@ -49,6 +57,10 @@ public static class RefuelablePatch {
 }
 ```
 
+## How It Works
+
+PurePatcher rewrites assemblies at game load time. It uses Mono.Cecil to modify IL, then loads the rewritten assembly bytes before the game continues.
+
 ## Acknowledgments
 
-PurePatcher is forked from [Prepatcher](https://github.com/Zetrith/Prepatcher), and builds on Harmony, MonoMod, and Mono.Cecil.
+PurePatcher is forked from [Prepatcher](https://github.com/Zetrith/Prepatcher), and builds on [Harmony](https://github.com/pardeike/Harmony), [MonoMod](https://github.com/monomod/monomod), and [Mono.Cecil](https://github.com/jbevain/cecil).
