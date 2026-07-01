@@ -14,7 +14,7 @@ For mod projects, reference the annotations package:
 
 ```xml
 <ItemGroup>
-    <PackageReference Include="PurePatcher.Annotations" Version="1.3.0" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="PurePatcher.Annotations" Version="1.4.0" PrivateAssets="all" ExcludeAssets="runtime" />
 </ItemGroup>
 ```
 
@@ -42,12 +42,6 @@ public static extern ref int MyInt(this TargetClass target);
 public static int TargetMethod(TargetClass target, int value) {
     return value + 1;
 }
-```
-
-## Build
-
-```sh
-dotnet build Source/PurePatcher.slnx
 ```
 
 ## Acknowledgments
