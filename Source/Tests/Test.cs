@@ -65,7 +65,7 @@ internal class Test {
 
             // The bodies have to be initialized because the test runtime doesn't seem to like non pinvoke extern methods
             // Mono is fine with them
-            foreach (var m in FieldAdder.GetAllPurePatcherFieldAccessors(testAsmToBeLive.Types)) {
+            foreach (var m in FieldAdder.GetAllAddFieldAccessors(testAsmToBeLive.Types)) {
                 Util.SetEmptyBody(m);
             }
 
@@ -78,7 +78,7 @@ internal class Test {
             testTargetAsmToBeLive.Name = testAssemblyTargetNewName;
             testTargetAsmToBeLive.Assembly.Name.Name = testAssemblyTargetNewName;
 
-            foreach (var m in FieldAdder.GetAllPurePatcherFieldAccessors(testTargetAsmToBeLive.Types))
+            foreach (var m in FieldAdder.GetAllAddFieldAccessors(testTargetAsmToBeLive.Types))
                 Util.SetEmptyBody(m);
 
             var stream = new MemoryStream();

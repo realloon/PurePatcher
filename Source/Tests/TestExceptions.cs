@@ -15,7 +15,7 @@ internal class TestExceptions : Test {
 
     [Test]
     public void TestBadFieldAccessors() {
-        foreach (var accessor in FieldAdder.GetAllPurePatcherFieldAccessors(TestExtensions.EnumerableOf(_typeFail))) {
+        foreach (var accessor in FieldAdder.GetAllAddFieldAccessors(TestExtensions.EnumerableOf(_typeFail))) {
             Assert.Throws<LogErrorException>(() => { FieldAdder.ProcessAccessor(accessor); }, accessor.Name);
         }
     }

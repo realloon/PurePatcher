@@ -35,7 +35,7 @@ Declare the mod dependency in `About.xml`:
 ```cs
 using PurePatcher.Annotations;
 
-[PurePatcherField]
+[AddField]
 public static extern ref int MyInt(this TargetClass target);
 
 [ReplaceMethod(typeof(TargetClass), nameof(TargetClass.TargetMethod))]

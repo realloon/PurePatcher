@@ -7,4 +7,4 @@ namespace PurePatcher.Annotations;
 /// </summary>
 [MeansImplicitUse]
 [AttributeUsage(AttributeTargets.Method)]
-public class PurePatcherFieldAttribute : Attribute;
+public class AddFieldAttribute : Attribute;

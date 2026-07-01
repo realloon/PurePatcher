@@ -17,7 +17,7 @@ internal partial class FieldAdder(AssemblySet set) {
     }
 
     internal void ProcessTypes(IEnumerable<TypeDefinition> inTypes) {
-        foreach (var accessor in GetAllPurePatcherFieldAccessors(inTypes)) {
+        foreach (var accessor in GetAllAddFieldAccessors(inTypes)) {
             ProcessAccessor(accessor);
         }
     }
@@ -122,10 +122,10 @@ internal partial class FieldAdder(AssemblySet set) {
     }
 
     internal static IEnumerable<MethodDefinition>
-        GetAllPurePatcherFieldAccessors(IEnumerable<TypeDefinition> inTypes) => inTypes
+        GetAllAddFieldAccessors(IEnumerable<TypeDefinition> inTypes) => inTypes
         .Where(t => t.IsSealed && t.IsAbstract)
         .SelectMany(t => t.Methods, (t, m) => new { t, m })
-        .Where(t1 => t1.m.HasCustomAttribute(typeof(PurePatcherFieldAttribute).FullName!))
+        .Where(t1 => t1.m.HasCustomAttribute(typeof(AddFieldAttribute).FullName!))
         .Select(t1 => t1.m);
 }
 

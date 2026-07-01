@@ -5,30 +5,30 @@ namespace Tests;
 
 public static class Injections {
     extension(BaseWithComps target) {
-        [PurePatcherField]
+        [AddField]
         [InjectComponent]
         private extern OtherComp SomeComp();
 
-        [PurePatcherField]
+        [AddField]
         [InjectComponent]
         private extern DerivedMyComponent MyComp();
 
-        [PurePatcherField]
+        [AddField]
         [InjectComponent]
         private extern MyComponent MyCompBase();
     }
 
     extension(DerivedWithComps target) {
-        [PurePatcherField]
+        [AddField]
         [InjectComponent]
         private extern DerivedMyComponent MyCompOnSubType();
 
-        [PurePatcherField]
+        [AddField]
         [InjectComponent]
         private extern MyComponent MyCompBaseOnSubType();
     }
 
-    [PurePatcherField]
+    [AddField]
     [InjectComponent]
     private static extern MyComponent MyCompBaseOnSuperType(this InjectionBase target);
 

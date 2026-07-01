@@ -5,20 +5,20 @@ using TestAssemblyTarget;
 namespace Tests;
 
 public static class NewFields {
-    [PurePatcherField]
+    [AddField]
     private static extern ref int MyInt(this TargetClass target);
 
-    [PurePatcherField]
+    [AddField]
     private static extern ref int MyIntStruct(this ref TargetStruct target);
 
-    [PurePatcherField]
+    [AddField]
     private static extern ref List<T> MyList<T>(this TargetGeneric<T> target);
 
     extension<T, TU, TW>(TargetGeneric3<T, TU, TW> b) {
-        [PurePatcherField]
+        [AddField]
         private extern ref (T, TW, TU) MyTriple();
 
-        [PurePatcherField]
+        [AddField]
         private extern ref (T, T) MyPair();
     }
 

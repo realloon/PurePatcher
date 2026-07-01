@@ -6,108 +6,108 @@ namespace Tests;
 public static class DefaultValues {
     // bool defaults
     extension(TargetClass target) {
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(false)]
         public extern ref bool MyBoolDefaultFalse();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(true)]
         public extern ref bool MyBoolDefaultTrue();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(int.MinValue)]
         public extern ref int MyIntDefaultMin();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(int.MaxValue)]
         public extern ref int MyIntDefaultMax();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(null)]
         public extern ref int MyIntDefaultNull();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(uint.MinValue)]
         public extern ref uint MyUIntDefaultMin();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(uint.MaxValue)]
         public extern ref uint MyUIntDefaultMax();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(null)]
         public extern ref uint MyUIntDefaultNull();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(long.MinValue)]
         public extern ref long MyLongDefaultMin();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(long.MaxValue)]
         public extern ref long MyLongDefaultMax();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(null)]
         public extern ref long MyLongDefaultNull();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(ulong.MinValue)]
         public extern ref ulong MyULongDefaultMin();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(ulong.MaxValue)]
         public extern ref ulong MyULongDefaultMax();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(null)]
         public extern ref ulong MyULongDefaultNull();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(float.MinValue)]
         public extern ref float MyFloatDefaultMin();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(float.MaxValue)]
         public extern ref float MyFloatDefaultMax();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(null)]
         public extern ref float MyFloatDefaultNull();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(double.MinValue)]
         public extern ref double MyDoubleDefaultMin();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(double.MaxValue)]
         public extern ref double MyDoubleDefaultMax();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(null)]
         public extern ref double MyDoubleDefaultNull();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue(null)]
         public extern ref string MyStringDefaultNull();
 
-        [PurePatcherField]
+        [AddField]
         [DefaultValue("a")]
         public extern ref string MyStringDefault();
 
-        [PurePatcherField]
+        [AddField]
         [ValueInitializer(nameof(IntParameterlessInitializer))]
         public extern ref int MyIntParameterless();
 
-        [PurePatcherField]
+        [AddField]
         [ValueInitializer(nameof(IntThisInitializer))]
         public extern ref int MyIntFromThis();
 
-        [PurePatcherField]
+        [AddField]
         [ValueInitializer(nameof(ObjectThisInitializer))]
         public extern ref SecondTargetClass MyObjectFromThis();
     }
 
-    [PurePatcherField]
+    [AddField]
     [ValueInitializer(nameof(CounterInitializer))]
     public static extern ref int MyIntCounter(this DerivedCtorsClass target);
 

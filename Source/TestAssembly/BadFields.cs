@@ -5,37 +5,37 @@ using TestAssemblyTarget;
 namespace Tests;
 
 public static class BadFields {
-    [PurePatcherField]
+    [AddField]
     private static extern ref T FailGenericMethod<T>(TargetClass target);
 
-    [PurePatcherField]
+    [AddField]
     private static extern ref T FailNestedGeneric<T>(TargetGeneric<List<T>> target);
 
-    [PurePatcherField]
+    [AddField]
     private static extern ref int FailConcreteGeneric(TargetGeneric<int> target);
 
-    [PurePatcherField]
+    [AddField]
     private static extern ref int FailGenericCount<T, TU>(TargetGeneric<T> target);
 
-    [PurePatcherField]
+    [AddField]
     private static extern ref int FailGenericsDontMatch<T>(TargetGeneric3<T, T, T> target);
 
-    [PurePatcherField]
+    [AddField]
     private static extern ref int FailGenericsDontMatch<T, TU, TW>(TargetGeneric3<T, TW, TU> target);
 
     // The parameter type is List because it isn't resolvable in the test environment
     // (System assembly isn't provided)
-    [PurePatcherField]
+    [AddField]
     private static extern ref int FailUnresolvable<T>(List<T> target);
 
-    [PurePatcherField]
+    [AddField]
     private static extern ref int FailInterface(ITarget target);
 
-    [PurePatcherField]
+    [AddField]
     [InjectComponent]
     private static extern ref BaseComp FailInjectionByRef(BaseWithComps target);
 
-    [PurePatcherField]
+    [AddField]
     [InjectComponent]
     private static extern BaseComp FailUnknownInjection(TargetClass target);
 }
