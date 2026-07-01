@@ -33,14 +33,19 @@ Declare the mod dependency in `About.xml`:
 ## Example
 
 ```cs
+using RimWorld;
 using PurePatcher.Annotations;
 
-[AddField]
-public static extern ref int MyInt(this TargetClass target);
+public static class RefuelablePatch {
+    [AddField]
+    [DefaultValue(0)]
+    private static extern ref int InspectCount(this CompRefuelable comp);
 
-[ReplaceMethod(typeof(TargetClass), nameof(TargetClass.TargetMethod))]
-public static int TargetMethod(TargetClass target, int value) {
-    return value + 1;
+    [ReplaceMethod(typeof(CompRefuelable), nameof(CompRefuelable.CompInspectStringExtra))]
+    public static string CompInspectStringExtra(CompRefuelable comp) {
+        comp.InspectCount()++;
+        return $"{comp.Props.FuelLabel}: {comp.Fuel} ({comp.InspectCount()})";
+    }
 }
 ```
 
