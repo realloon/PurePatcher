@@ -40,7 +40,7 @@ internal partial class FieldAdder(AssemblySet set) {
             PatchCtorsWithDefault(newField, attr);
         }
 
-        if (GetValueInitializer(accessor) is { } initializerAttr) {
+        if (GetInitValue(accessor) is { } initializerAttr) {
             PatchCtorsWithInitializer(accessor, newField, initializerAttr);
         }
     }

@@ -32,10 +32,10 @@ public static class BadFields {
     private static extern ref int FailInterface(ITarget target);
 
     [AddField]
-    [InjectComponent]
+    [BindComponent]
     private static extern ref BaseComp FailInjectionByRef(BaseWithComps target);
 
     [AddField]
-    [InjectComponent]
+    [BindComponent]
     private static extern BaseComp FailUnknownInjection(TargetClass target);
 }

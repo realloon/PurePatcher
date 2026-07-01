@@ -28,10 +28,10 @@ internal partial class FieldAdder {
         if (!HasInjection(accessor)) return null;
 
         if (GetInjectionSite(accessor) == null) {
-            return "Unknown injection owner type/component type pair";
+            return "Unknown component binding owner type/component type pair";
         }
 
-        return accessor.ReturnType.IsByReference ? "Injected field cannot have a setter" : null;
+        return accessor.ReturnType.IsByReference ? "Component-bound field cannot have a setter" : null;
     }
 
     private static IEnumerable<TypeReference> GenericArgumentsOf(TypeReference t) {

@@ -84,8 +84,8 @@ internal class TestPatches : Test {
     }
 
     [Test]
-    public void TestDefaultValueInitializers() {
-        var values = DefaultValues.TestDefaultValueInitializers();
+    public void TestDefaultInitValues() {
+        var values = DefaultValues.TestDefaultInitValues();
 
         Assert.Multiple(() => {
             Assert.That(values[0], Is.EqualTo(DefaultValues.IntParameterlessInitializer()));

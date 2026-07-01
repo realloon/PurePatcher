@@ -95,20 +95,20 @@ public static class DefaultValues {
         public extern ref string MyStringDefault();
 
         [AddField]
-        [ValueInitializer(nameof(IntParameterlessInitializer))]
+        [InitValue(nameof(IntParameterlessInitializer))]
         public extern ref int MyIntParameterless();
 
         [AddField]
-        [ValueInitializer(nameof(IntThisInitializer))]
+        [InitValue(nameof(IntThisInitializer))]
         public extern ref int MyIntFromThis();
 
         [AddField]
-        [ValueInitializer(nameof(ObjectThisInitializer))]
+        [InitValue(nameof(ObjectThisInitializer))]
         public extern ref SecondTargetClass MyObjectFromThis();
     }
 
     [AddField]
-    [ValueInitializer(nameof(CounterInitializer))]
+    [InitValue(nameof(CounterInitializer))]
     public static extern ref int MyIntCounter(this DerivedCtorsClass target);
 
     public static int IntParameterlessInitializer() => 1;
@@ -147,7 +147,7 @@ public static class DefaultValues {
         ];
     }
 
-    public static object?[] TestDefaultValueInitializers() {
+    public static object?[] TestDefaultInitValues() {
         var target = new TargetClass();
         return [
             target.MyIntParameterless(),

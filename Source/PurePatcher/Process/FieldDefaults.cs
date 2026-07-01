@@ -75,8 +75,8 @@ internal partial class FieldAdder {
     private static CustomAttribute? GetExplicitDefaultValue(MethodDefinition accessor) => accessor
         .GetCustomAttribute(typeof(DefaultValueAttribute).FullName!);
 
-    private static CustomAttribute? GetValueInitializer(MethodDefinition accessor) => accessor
-        .GetCustomAttribute(typeof(ValueInitializerAttribute).FullName!);
+    private static CustomAttribute? GetInitValue(MethodDefinition accessor) => accessor
+        .GetCustomAttribute(typeof(InitValueAttribute).FullName!);
 
     private static bool CallsAThisCtor(MethodDefinition method) {
         foreach (var inst in method.Body.Instructions)

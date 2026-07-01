@@ -108,5 +108,5 @@ internal partial class FieldAdder {
     }
 
     private static bool HasInjection(MethodDefinition accessor) => accessor
-        .HasCustomAttribute(typeof(InjectComponentAttribute).FullName!);
+        .HasCustomAttribute(typeof(BindComponentAttribute).FullName!);
 }

@@ -6,30 +6,30 @@ namespace Tests;
 public static class Injections {
     extension(BaseWithComps target) {
         [AddField]
-        [InjectComponent]
+        [BindComponent]
         private extern OtherComp SomeComp();
 
         [AddField]
-        [InjectComponent]
+        [BindComponent]
         private extern DerivedMyComponent MyComp();
 
         [AddField]
-        [InjectComponent]
+        [BindComponent]
         private extern MyComponent MyCompBase();
     }
 
     extension(DerivedWithComps target) {
         [AddField]
-        [InjectComponent]
+        [BindComponent]
         private extern DerivedMyComponent MyCompOnSubType();
 
         [AddField]
-        [InjectComponent]
+        [BindComponent]
         private extern MyComponent MyCompBaseOnSubType();
     }
 
     [AddField]
-    [InjectComponent]
+    [BindComponent]
     private static extern MyComponent MyCompBaseOnSuperType(this InjectionBase target);
 
     // Exact comp type, initializer type == target type
