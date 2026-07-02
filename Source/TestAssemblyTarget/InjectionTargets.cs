@@ -29,3 +29,19 @@ public class BaseWithComps : InjectionBase {
 }
 
 public class DerivedWithComps : BaseWithComps;
+
+public class NullableWithComps {
+    public List<BaseComp>? comps;
+    public Type[] CompTypes = [];
+
+    public void InitComps() {
+        if (CompTypes.Length == 0) return;
+
+        comps = [];
+
+        foreach (var type in CompTypes) {
+            var comp = (BaseComp)Activator.CreateInstance(type);
+            comps.Add(comp);
+        }
+    }
+}

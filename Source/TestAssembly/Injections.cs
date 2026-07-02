@@ -32,6 +32,10 @@ public static class Injections {
     [BindComponent]
     private static extern MyComponent MyCompBaseOnSuperType(this InjectionBase target);
 
+    [AddField]
+    [BindComponent]
+    private static extern MyComponent? NullableMyComp(this NullableWithComps target);
+
     // Exact comp type, initializer type == target type
     public static bool TestOtherCompInjection() {
         var thing = new BaseWithComps { CompTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
@@ -80,6 +84,18 @@ public static class Injections {
         var thing = new DerivedWithComps { CompTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
         thing.InitComps();
         return thing.MyCompBaseOnSuperType() == thing.comps[0];
+    }
+
+    public static bool TestNullCompsInjection() {
+        var thing = new NullableWithComps { CompTypes = [] };
+        thing.InitComps();
+        return thing.NullableMyComp() == null;
+    }
+
+    public static bool TestNullableCompsInjection() {
+        var thing = new NullableWithComps { CompTypes = [typeof(DerivedMyComponent)] };
+        thing.InitComps();
+        return thing.NullableMyComp() == thing.comps![0];
     }
 }
 

@@ -36,10 +36,18 @@ internal class Test {
         TestAsm.SourceAssembly = liveAsms.Test;
 
         var typeThingWithComps = TargetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseWithComps");
+        var typeNullableWithComps = TargetAsm.ModuleDefinition.GetType("TestAssemblyTarget.NullableWithComps");
         var typeThingComp = TargetAsm.ModuleDefinition.GetType("TestAssemblyTarget.BaseComp");
 
         FieldAdder.RegisterInjection(
             typeThingWithComps,
+            typeThingComp,
+            "InitComps",
+            "comps"
+        );
+
+        FieldAdder.RegisterInjection(
+            typeNullableWithComps,
             typeThingComp,
             "InitComps",
             "comps"

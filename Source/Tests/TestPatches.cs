@@ -43,6 +43,8 @@ internal class TestPatches : Test {
             Assert.That(Injections.TestCompInjectionOnSubType(), Is.True);
             Assert.That(Injections.TestCompBaseInjectionOnSubType(), Is.True);
             Assert.That(Injections.TestCompInjectionOnSuperType(), Is.True);
+            Assert.That(Injections.TestNullCompsInjection(), Is.True);
+            Assert.That(Injections.TestNullableCompsInjection(), Is.True);
         });
     }
 

@@ -7,9 +7,10 @@ public static class InjectionHelper {
         field = default;
     }
 
-    public static void TryInject<T, TF>(ref TF field, object target, IEnumerable<object> comps) {
+    public static void TryInject<T, TF>(ref TF? field, object target, IEnumerable<object>? comps) {
         if (target is not T) return;
         if (field != null) return;
+        if (comps == null) return;
 
         foreach (var comp in comps) {
             if (comp is not TF casted) continue;
