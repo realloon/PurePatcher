@@ -18,6 +18,16 @@ internal static class AssemblyCollector {
         }
     }
 
+    internal static HashSet<string> ActivePackageIds() {
+        var packageIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var mod in LoadedModManager.RunningModsListForReading) {
+            packageIds.Add(mod.PackageId);
+        }
+
+        return packageIds;
+    }
+
     private static IEnumerable<(ModContentPack, Assembly)> GetModAssemblies() => LoadedModManager
         .RunningModsListForReading
         .SelectMany(m => m.assemblies.loadedAssemblies, (m, a) => (m, a));

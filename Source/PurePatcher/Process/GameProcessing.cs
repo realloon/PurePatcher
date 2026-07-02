@@ -17,7 +17,7 @@ internal static class GameProcessing {
         fieldAdder.ProcessAllAssemblies();
 
         // Method replacement
-        MethodReplacer.RunReplacements(set);
+        MethodReplacer.RunReplacements(set, AssemblyCollector.ActivePackageIds());
 
         // Fix the update order of RimWorld's reloaded Unity components
         ExecutionOrderFixer.ApplyExecutionOrderAttributes(asmCSharp.ModuleDefinition);

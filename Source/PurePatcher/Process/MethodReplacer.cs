@@ -7,10 +7,15 @@ namespace PurePatcher.Process;
 
 internal static class MethodReplacer {
     internal static void RunReplacements(AssemblySet set) {
+        RunReplacements(set, []);
+    }
+
+    internal static void RunReplacements(AssemblySet set, IEnumerable<string> activePackageIds) {
+        var activePackageIdSet = new HashSet<string>(activePackageIds, StringComparer.OrdinalIgnoreCase);
         var replacedTargets = new HashSet<MethodDefinition>();
 
         foreach (var assembly in set.AllAssemblies.Where(assembly => assembly.ProcessAttributes))
-        foreach (var replacement in FindReplacementMethods(assembly.ModuleDefinition)) {
+        foreach (var replacement in FindReplacementMethods(assembly.ModuleDefinition, activePackageIdSet)) {
             var target = FindTargetMethod(set, replacement);
 
             if (!replacedTargets.Add(target)) {
@@ -23,9 +28,25 @@ internal static class MethodReplacer {
         }
     }
 
-    private static IEnumerable<MethodDefinition> FindReplacementMethods(ModuleDefinition module) => AllTypes(module)
+    private static IEnumerable<MethodDefinition> FindReplacementMethods(ModuleDefinition module,
+        HashSet<string> activePackageIds) => AllTypes(module)
         .SelectMany(type => type.Methods)
-        .Where(method => GetReplaceMethodAttribute(method) != null);
+        .Where(method => GetReplaceMethodAttribute(method) != null)
+        .Where(method => !IsDisabledByActiveMod(method, activePackageIds));
+
+    private static bool IsDisabledByActiveMod(MethodDefinition method, HashSet<string> activePackageIds) {
+        var attribute = GetDisabledIfModActiveAttribute(method);
+        if (attribute == null) return false;
+
+        foreach (var packageId in GetDisabledPackageIds(attribute, method)) {
+            if (!activePackageIds.Contains(packageId)) continue;
+
+            Logger.Verbose($"Skipping method replacement {method.MemberFullName()} because {packageId} is active.");
+            return true;
+        }
+
+        return false;
+    }
 
     private static MethodDefinition FindTargetMethod(AssemblySet set, MethodDefinition replacement) {
         ValidateReplacementMethod(replacement);
@@ -132,21 +153,19 @@ internal static class MethodReplacer {
 
     private static object? ImportOperand(object? operand, MethodDefinition target, MethodDefinition replacement,
         IReadOnlyDictionary<Instruction, Instruction> instructionMap,
-        IReadOnlyDictionary<VariableDefinition, VariableDefinition> variableMap) {
-        return operand switch {
-            null => null,
-            Instruction instruction => instructionMap[instruction],
-            Instruction[] instructions => instructions.Select(instruction => instructionMap[instruction]).ToArray(),
-            VariableDefinition variable => variableMap[variable],
-            ParameterDefinition parameter => MapParameter(parameter, target, replacement),
-            MethodReference method => target.Module.ImportReference(method),
-            FieldReference field => target.Module.ImportReference(field),
-            TypeReference type => target.Module.ImportReference(type),
-            CallSite => throw new InvalidOperationException(
-                $"Replacement method {replacement.MemberFullName()} cannot use calli instructions."),
-            _ => operand
-        };
-    }
+        IReadOnlyDictionary<VariableDefinition, VariableDefinition> variableMap) => operand switch {
+        null => null,
+        Instruction instruction => instructionMap[instruction],
+        Instruction[] instructions => instructions.Select(instruction => instructionMap[instruction]).ToArray(),
+        VariableDefinition variable => variableMap[variable],
+        ParameterDefinition parameter => MapParameter(parameter, target, replacement),
+        MethodReference method => target.Module.ImportReference(method),
+        FieldReference field => target.Module.ImportReference(field),
+        TypeReference type => target.Module.ImportReference(type),
+        CallSite => throw new InvalidOperationException(
+            $"Replacement method {replacement.MemberFullName()} cannot use calli instructions."),
+        _ => operand
+    };
 
     private static Instruction? MapInstruction(Instruction? instruction,
         IReadOnlyDictionary<Instruction, Instruction> instructionMap) {
@@ -267,6 +286,39 @@ internal static class MethodReplacer {
     private static CustomAttribute? GetReplaceMethodAttribute(MethodDefinition method) => method
         .CustomAttributes
         .SingleOrDefault(attribute => attribute.AttributeType.FullName == typeof(ReplaceMethodAttribute).FullName);
+
+    private static CustomAttribute? GetDisabledIfModActiveAttribute(MethodDefinition method) => method
+        .CustomAttributes
+        .SingleOrDefault(attribute =>
+            attribute.AttributeType.FullName == typeof(DisabledIfModActiveAttribute).FullName);
+
+    private static string[] GetDisabledPackageIds(CustomAttribute attribute, MethodDefinition method) {
+        if (attribute.ConstructorArguments.Count != 1 ||
+            attribute.ConstructorArguments[0].Value is not IEnumerable<CustomAttributeArgument> packageIdArguments) {
+            throw new InvalidOperationException(
+                $"Invalid DisabledIfModActive annotation on {method.MemberFullName()}.");
+        }
+
+        var packageIds = packageIdArguments
+            .Select(argument => PackageId(argument, method))
+            .ToArray();
+
+        if (packageIds.Length == 0) {
+            throw new InvalidOperationException(
+                $"DisabledIfModActive annotation on {method.MemberFullName()} must specify at least one packageId.");
+        }
+
+        return packageIds;
+    }
+
+    private static string PackageId(CustomAttributeArgument argument, MethodDefinition method) {
+        if (argument.Value is string packageId && !string.IsNullOrWhiteSpace(packageId)) {
+            return packageId;
+        }
+
+        throw new InvalidOperationException(
+            $"DisabledIfModActive annotation on {method.MemberFullName()} contains an invalid packageId.");
+    }
 
     private static IEnumerable<TypeDefinition> AllTypes(ModuleDefinition module) => module.Types
         .SelectMany(SelfAndNestedTypes);

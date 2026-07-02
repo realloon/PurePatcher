@@ -14,4 +14,8 @@ public class ReplaceMethodTarget {
     public static string StaticMethod(string value) => value;
 
     public int BranchMethod(int value) => value;
+
+    public int ActiveModConditionMethod() => 1;
+
+    public int InactiveModConditionMethod() => 1;
 }

@@ -4,6 +4,10 @@ using TestAssemblyTarget;
 namespace Tests;
 
 public static class MethodReplacement {
+    // ReSharper disable once MemberCanBePrivate.Global
+    public const string InactivePackageId = "PurePatcher.Tests.Inactive";
+    public const string ActivePackageId = "PurePatcher.Tests.Active";
+
     public static int TestInstanceMethod() => new ReplaceMethodTarget().InstanceMethod(5);
 
     public static string TestStaticMethod() => ReplaceMethodTarget.StaticMethod("a");
@@ -28,5 +32,17 @@ public static class MethodReplacement {
         }
 
         return -result;
+    }
+
+    [ReplaceMethod(typeof(ReplaceMethodTarget), nameof(ReplaceMethodTarget.ActiveModConditionMethod))]
+    [DisabledIfModActive(ActivePackageId)]
+    public static int ReplaceActiveModConditionMethod(ReplaceMethodTarget self) {
+        return 2;
+    }
+
+    [ReplaceMethod(typeof(ReplaceMethodTarget), nameof(ReplaceMethodTarget.InactiveModConditionMethod))]
+    [DisabledIfModActive(InactivePackageId)]
+    public static int ReplaceInactiveModConditionMethod(ReplaceMethodTarget self) {
+        return 2;
     }
 }
