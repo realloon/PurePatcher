@@ -86,16 +86,18 @@ internal class Test {
             testTargetAsmToBeLive.Name = testAssemblyTargetNewName;
             testTargetAsmToBeLive.Assembly.Name.Name = testAssemblyTargetNewName;
 
-            foreach (var m in FieldAdder.GetAllAddFieldAccessors(testTargetAsmToBeLive.Types))
+            foreach (var m in FieldAdder.GetAllAddFieldAccessors(testTargetAsmToBeLive.Types)) {
                 Util.SetEmptyBody(m);
+            }
 
             var stream = new MemoryStream();
             testTargetAsmToBeLive.Write(stream);
             liveTargetAsm = Assembly.Load(stream.ToArray());
         }
 
-        AppDomain.CurrentDomain.AssemblyResolve +=
-            (_, args) => args.Name.StartsWith(testAssemblyTargetNewName) ? liveTargetAsm : null;
+        AppDomain.CurrentDomain.AssemblyResolve += (_, args) => args.Name.StartsWith(testAssemblyTargetNewName)
+            ? liveTargetAsm
+            : null;
 
         return (liveTestAsm, liveTargetAsm);
     }
@@ -104,7 +106,5 @@ internal class Test {
         Assembly.Load(asm.Bytes!);
     }
 
-    private static string AssemblyPath(string fileName) {
-        return Path.Combine(AppContext.BaseDirectory, fileName);
-    }
+    private static string AssemblyPath(string fileName) => Path.Combine(AppContext.BaseDirectory, fileName);
 }
