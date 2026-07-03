@@ -4,7 +4,7 @@
   <name>PurePatcher</name>
   <description>PurePatcher is a structured assembly rewriting library for RimWorld mod developers.</description>
   <author>Zetrith, Vortex</author>
-  <modVersion>1.5.1</modVersion>
+  <modVersion>1.5.2</modVersion>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
@@ -21,4 +21,7 @@
       <downloadUrl>https://github.com/pardeike/HarmonyRimWorld</downloadUrl>
     </li>
   </modDependencies>
+  <incompatibleWith>
+    <li>zetrith.prepatcher</li>
+  </incompatibleWith>
 </ModMetaData>
