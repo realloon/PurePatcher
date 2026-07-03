@@ -12,8 +12,6 @@ internal class PurePatcherMod : Mod {
     public PurePatcherMod(ModContentPack content) : base(content) {
         InitLogger();
 
-        Patches.HarmonyPatches.AddVerboseProfiling();
-
         if (DataStore.StartedOnce) {
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (_, args) => {
                 Logger.Verbose($"ReflectionOnlyAssemblyResolve: {args.RequestingAssembly} requested {args.Name}");
