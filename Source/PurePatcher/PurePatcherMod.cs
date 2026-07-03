@@ -41,6 +41,4 @@ internal class PurePatcherMod : Mod {
             Logger.VerboseFunc = msg => Log.Message($"PurePatcher Verbose: {msg}");
         }
     }
-
-    public override string SettingsCategory() => "PurePatcher";
 }
