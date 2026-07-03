@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Annotations\Annotations.csproj" />
-    <ProjectReference Include="..\DataAssembly\DataAssembly.csproj" />
   </ItemGroup>
 
   <ItemGroup>

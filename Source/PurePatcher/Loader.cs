@@ -50,11 +50,7 @@ internal static class Loader {
 
             var addedAsm = set.AddAssembly(friendlyName, null, asm);
 
-            if (name.EndsWith("DataAssembly")) {
-                addedAsm.AllowPatches = false;
-            } else {
-                addedAsm.ProcessAttributes = true;
-            }
+            addedAsm.ProcessAttributes = true;
         }
 
         using (StopwatchScope.Measure("Game processing")) GameProcessing.Process(set);

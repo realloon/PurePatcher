@@ -1,7 +1,6 @@
 using JetBrains.Annotations;
 using UnityEngine;
 using Verse;
-using DataAssembly;
 
 namespace PurePatcher;
 
@@ -12,7 +11,7 @@ internal class PurePatcherMod : Mod {
     public PurePatcherMod(ModContentPack content) : base(content) {
         InitLogger();
 
-        if (DataStore.StartedOnce) {
+        if (BootstrapState.StartedOnce) {
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (_, args) => {
                 Logger.Verbose($"ReflectionOnlyAssemblyResolve: {args.RequestingAssembly} requested {args.Name}");
                 return null;
@@ -22,7 +21,7 @@ internal class PurePatcherMod : Mod {
             return;
         }
 
-        DataStore.StartedOnce = true;
+        BootstrapState.MarkStartedOnce();
         Logger.Info($"Starting... (vanilla load took {Time.realtimeSinceStartup}s)");
 
         Patches.HarmonyPatches.SilenceLogging();
@@ -35,8 +34,8 @@ internal class PurePatcherMod : Mod {
     }
 
     private static void InitLogger() {
-        Logger.InfoFunc = msg => Log.Message($"PurePatcher: {msg}");
-        Logger.ErrorFunc = msg => Log.Error($"PurePatcher Error: {msg}");
+        Logger.InfoFunc = msg => Log.Message("[PurePatcher]: " + msg);
+        Logger.ErrorFunc = msg => Log.Error($"[PurePatcher]: " + msg);
 
         if (GenCommandLine.CommandLineArgPassed(CmdArgVerbose)) {
             Logger.VerboseFunc = msg => Log.Message($"PurePatcher Verbose: {msg}");
