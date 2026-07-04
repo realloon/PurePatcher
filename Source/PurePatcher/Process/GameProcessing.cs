@@ -21,7 +21,6 @@ internal static class GameProcessing {
         MethodReplacer.RunReplacements(set, AssemblyCollector.ActivePackageIds());
 
         if (prepatcherActive) {
-            // [Prepatcher] compatibility
             Logger.Info("Prepatcher is active; skipping duplicate startup support patches.");
         } else {
             // Fix the update order of RimWorld's reloaded Unity components
@@ -29,11 +28,8 @@ internal static class GameProcessing {
             asmCSharp.Modified = true; // Mark as modified so it's serialized and new attributes are applied
         }
 
-        // [Prepatcher] compatibility
-        var skippedPatcherTypes = prepatcherActive ? PrepatcherCompatibility.BuiltinFreePatchTypes : null;
-
         // Free patching
         FreePatcher.RunPatches(set, AssemblyCollector.AssemblyCSharp,
-            skippedPatcherTypes: skippedPatcherTypes); // [Prepatcher] compatibility
+            skippedPatcherType: prepatcherActive ? PrepatcherCompatibility.BuiltinFreePatchTypeToSkip : null);
     }
 }

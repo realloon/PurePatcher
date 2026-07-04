@@ -8,8 +8,5 @@ internal static class PrepatcherCompatibility {
 
     internal static bool IsActive() => ModLister.GetActiveModWithIdentifier(PackageId, ignorePostfix: true) != null;
 
-    internal static readonly HashSet<Type> BuiltinFreePatchTypes = [
-        typeof(AssemblyLoadingFreePatch),
-        typeof(WorldCameraFreePatch)
-    ];
+    internal static readonly Type BuiltinFreePatchTypeToSkip = typeof(AssemblyLoadingFreePatch);
 }
