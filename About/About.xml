@@ -10,6 +10,7 @@
   </supportedVersions>
   <loadAfter>
     <li>brrainz.harmony</li>
+    <li>zetrith.prepatcher</li>
   </loadAfter>
   <loadBefore>
     <li>Ludeon.RimWorld</li>
@@ -21,7 +22,4 @@
       <downloadUrl>https://github.com/pardeike/HarmonyRimWorld</downloadUrl>
     </li>
   </modDependencies>
-  <incompatibleWith>
-    <li>zetrith.prepatcher</li>
-  </incompatibleWith>
 </ModMetaData>
