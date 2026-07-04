@@ -8,7 +8,8 @@ namespace PurePatcher.Process;
 
 internal static class FreePatcher {
     internal static void RunPatches(AssemblySet assemblySet, string mainAssemblyName,
-        Action<ModifiableAssembly>? callback = null) {
+        Action<ModifiableAssembly>? callback = null,
+        HashSet<Type>? skippedPatcherTypes = null) { // [Prepatcher] compatibility
         Logger.Verbose("Running free patches");
 
         var patcherAssemblies = assemblySet.AllAssemblies
@@ -21,6 +22,12 @@ internal static class FreePatcher {
 
         foreach (var modifiableAssembly in patcherAssemblies)
         foreach (var patcher in FindAllFreePatches(modifiableAssembly.SourceAssembly!)) {
+            // [Prepatcher] compatibility
+            if (patcher.DeclaringType != null && skippedPatcherTypes?.Contains(patcher.DeclaringType) == true) {
+                Logger.Info("Skipping builtin free patch.");
+                continue;
+            }
+
             callback?.Invoke(modifiableAssembly);
             Logger.Verbose($"Running free patch: {patcher.FullDescription()}");
 
