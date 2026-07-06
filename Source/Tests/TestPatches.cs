@@ -107,10 +107,7 @@ internal class TestPatches : Test {
 
     [Test]
     public void TestFreePatching() {
-        Assert.Multiple(() => {
-            Assert.That(FreePatching.TestRewriteTargetMethod(), Is.EqualTo(1));
-            Assert.That(FreePatching.TestRewriteTargetMethod2(), Is.EqualTo("b"));
-        });
+        Assert.That(FreePatching.TestRewriteTargetMethod(), Is.EqualTo(1));
     }
 
     [Test]

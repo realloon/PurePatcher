@@ -30,16 +30,8 @@ internal static class FreePatcher {
             callback?.Invoke(modifiableAssembly);
             Logger.Verbose($"Running free patch: {patcher.FullDescription()}");
 
-            if (IsDefinedSafe<FreePatchAttribute>(patcher)) {
-                if (InvokePatcher(patcher, mainAssembly.ModuleDefinition)) {
-                    mainAssembly.Modified = true;
-                }
-            } else {
-                foreach (var asmToModify in assemblySet.AllAssemblies) {
-                    if (!asmToModify.AllowPatches || !InvokePatcher(patcher, asmToModify.ModuleDefinition)) continue;
-
-                    asmToModify.Modified = true;
-                }
+            if (InvokePatcher(patcher, mainAssembly.ModuleDefinition)) {
+                mainAssembly.Modified = true;
             }
         }
     }
@@ -69,6 +61,6 @@ internal static class FreePatcher {
     private static IEnumerable<MethodInfo> FindAllFreePatches(Assembly patcherAsm) => patcherAsm.GetTypes()
         .Where(AccessTools.IsStatic)
         .SelectMany(AccessTools.GetDeclaredMethods, (type, m) => new { type, m })
-        .Where(t => IsDefinedSafe<FreePatchAttribute>(t.m) || IsDefinedSafe<FreePatchAllAttribute>(t.m))
+        .Where(t => IsDefinedSafe<FreePatchAttribute>(t.m))
         .Select(t => t.m);
 }
