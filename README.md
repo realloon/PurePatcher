@@ -20,7 +20,7 @@ Add the annotation package to your `.csproj`:
 
 ```xml
 <ItemGroup>
-    <PackageReference Include="PurePatcher.Annotations" Version="1.5.0" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="PurePatcher.Annotations" Version="1.6.0" PrivateAssets="all" ExcludeAssets="runtime" />
 </ItemGroup>
 ```
 
