@@ -33,7 +33,7 @@ Declare the dependency in your `About.xml`:
   <li>
     <packageId>Vortex.PurePatcher</packageId>
     <displayName>PurePatcher</displayName>
-    <downloadUrl>https://github.com/realloon/PurePatcher</downloadUrl>
+    <steamWorkshopUrl>steam://url/CommunityFilePage/3755504957</steamWorkshopUrl>
   </li>
 </modDependencies>
 ```
