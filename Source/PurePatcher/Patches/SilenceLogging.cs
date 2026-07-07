@@ -19,13 +19,13 @@ internal static partial class HarmonyPatches {
         );
     }
 
-    private static bool LogErrorPrefix(string text) {
-        return !text.Contains("ThreadAbortException");
-    }
+    private static bool LogErrorPrefix(string text) => !text.Contains("ThreadAbortException");
 
     private static bool LogWarningPrefix(string text) {
-        if (!text.Contains("Tried to use an uninitialized DefOf"))
+        if (!text.Contains("Tried to use an uninitialized DefOf")) {
             return true;
+        }
+
         Debug.LogWarning(text);
         return false;
     }
