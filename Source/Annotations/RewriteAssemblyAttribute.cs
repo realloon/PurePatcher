@@ -3,8 +3,8 @@ using JetBrains.Annotations;
 namespace PurePatcher.Annotations;
 
 /// <summary>
-/// Marks an assembly rewriting method
+/// Marks a method that rewrites the target assembly module.
 /// </summary>
 [MeansImplicitUse]
 [AttributeUsage(AttributeTargets.Method)]
-public class FreePatchAttribute : Attribute;
+public class RewriteAssemblyAttribute : Attribute;

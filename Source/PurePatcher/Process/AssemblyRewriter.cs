@@ -6,13 +6,13 @@ using ICustomAttributeProvider = System.Reflection.ICustomAttributeProvider;
 
 namespace PurePatcher.Process;
 
-internal static class FreePatcher {
-    internal static void RunPatches(AssemblySet assemblySet, string mainAssemblyName,
+internal static class AssemblyRewriter {
+    internal static void RunRewrites(AssemblySet assemblySet, string mainAssemblyName,
         Action<ModifiableAssembly>? callback = null,
-        Type? skippedPatcherType = null) { // [Prepatcher] compatibility
-        Logger.Verbose("Running free patches");
+        Type? skippedRewriterType = null) { // [Prepatcher] compatibility
+        Logger.Verbose("Running assembly rewrites");
 
-        var patcherAssemblies = assemblySet.AllAssemblies
+        var rewriterAssemblies = assemblySet.AllAssemblies
             .Where(a => a.ProcessAttributes && a.SourceAssembly != null);
 
         var mainAssembly = assemblySet.FindAssembly(mainAssemblyName);
@@ -20,28 +20,28 @@ internal static class FreePatcher {
             throw new Exception($"Couldn't find main assembly {mainAssemblyName} in the assembly set");
         }
 
-        foreach (var modifiableAssembly in patcherAssemblies)
-        foreach (var patcher in FindAllFreePatches(modifiableAssembly.SourceAssembly!)) {
-            if (patcher.DeclaringType == skippedPatcherType) {
-                Logger.Info("Skipping builtin free patch.");
+        foreach (var modifiableAssembly in rewriterAssemblies)
+        foreach (var rewriter in FindAllAssemblyRewrites(modifiableAssembly.SourceAssembly!)) {
+            if (rewriter.DeclaringType == skippedRewriterType) {
+                Logger.Info("Skipping builtin assembly rewrite.");
                 continue;
             }
 
             callback?.Invoke(modifiableAssembly);
-            Logger.Verbose($"Running free patch: {patcher.FullDescription()}");
+            Logger.Verbose($"Running assembly rewrite: {rewriter.FullDescription()}");
 
-            if (InvokePatcher(patcher, mainAssembly.ModuleDefinition)) {
+            if (InvokeRewriter(rewriter, mainAssembly.ModuleDefinition)) {
                 mainAssembly.Modified = true;
             }
         }
     }
 
-    private static bool InvokePatcher(MethodInfo patcher, ModuleDefinition moduleToPatch) {
+    private static bool InvokeRewriter(MethodInfo rewriter, ModuleDefinition moduleToRewrite) {
         try {
-            var ret = patcher.Invoke(null, [moduleToPatch]);
+            var ret = rewriter.Invoke(null, [moduleToRewrite]);
             return ret == null || (bool)ret;
         } catch (Exception e) {
-            Logger.Error($"Exception running free patch {patcher.FullDescription()}: {e}");
+            Logger.Error($"Exception running assembly rewrite {rewriter.FullDescription()}: {e}");
             return false;
         }
     }
@@ -58,9 +58,10 @@ internal static class FreePatcher {
         }
     }
 
-    private static IEnumerable<MethodInfo> FindAllFreePatches(Assembly patcherAsm) => patcherAsm.GetTypes()
+    private static IEnumerable<MethodInfo> FindAllAssemblyRewrites(Assembly rewriterAssembly) => rewriterAssembly
+        .GetTypes()
         .Where(AccessTools.IsStatic)
         .SelectMany(AccessTools.GetDeclaredMethods, (type, m) => new { type, m })
-        .Where(t => IsDefinedSafe<FreePatchAttribute>(t.m))
+        .Where(t => IsDefinedSafe<RewriteAssemblyAttribute>(t.m))
         .Select(t => t.m);
 }

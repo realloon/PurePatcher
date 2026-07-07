@@ -6,8 +6,8 @@ using PurePatcher.Annotations;
 
 namespace PurePatcher.Patches;
 
-public static class WorldCameraFreePatch {
-    [FreePatch]
+public static class WorldCameraRewrite {
+    [RewriteAssembly]
     public static void ReplaceAddComponent(ModuleDefinition module) {
         var type = module.GetType($"RimWorld.Planet.{nameof(WorldCameraManager)}");
         var method = type.FindMethod(nameof(WorldCameraManager.CreateWorldCamera)) ??
@@ -16,7 +16,7 @@ public static class WorldCameraFreePatch {
         // For some reason, AddComponent treats WorldCameraDriver by name causing it to be loaded from old Assembly-CSharp
         foreach (var inst in method.Body.Instructions) {
             if (inst.Operand is MethodReference { Name: nameof(GameObject.AddComponent) }) {
-                inst.Operand = module.ImportReference(typeof(WorldCameraFreePatch).GetMethod(nameof(AddComponent)));
+                inst.Operand = module.ImportReference(typeof(WorldCameraRewrite).GetMethod(nameof(AddComponent)));
             }
         }
     }

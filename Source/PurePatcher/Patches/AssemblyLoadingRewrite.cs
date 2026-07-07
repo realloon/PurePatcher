@@ -6,8 +6,8 @@ using PurePatcher.Annotations;
 
 namespace PurePatcher.Patches;
 
-public static class AssemblyLoadingFreePatch {
-    [FreePatch]
+public static class AssemblyLoadingRewrite {
+    [RewriteAssembly]
     public static void ReplaceAssemblyLoading(ModuleDefinition module) {
         var type = module.GetType($"{nameof(Verse)}.{nameof(ModAssemblyHandler)}");
         var method = type.FindMethod(nameof(ModAssemblyHandler.ReloadAll)) ??
@@ -15,7 +15,7 @@ public static class AssemblyLoadingFreePatch {
 
         foreach (var inst in method.Body.Instructions) {
             if (inst.Operand is MethodReference { Name: nameof(Assembly.LoadFrom) })
-                inst.Operand = module.ImportReference(typeof(AssemblyLoadingFreePatch).GetMethod(nameof(LoadFrom)));
+                inst.Operand = module.ImportReference(typeof(AssemblyLoadingRewrite).GetMethod(nameof(LoadFrom)));
         }
     }
 

@@ -6,10 +6,10 @@ using TestAssemblyTarget;
 
 namespace Tests;
 
-public static class FreePatching {
+public static class AssemblyRewriting {
     public static int TestRewriteTargetMethod() => new RewriteTarget().Method();
 
-    [FreePatch]
+    [RewriteAssembly]
     public static void RewriteAssembly(ModuleDefinition module) {
         var type = module.GetType($"{nameof(TestAssemblyTarget)}.{nameof(RewriteTarget)}")!;
         var method = type.FindMethod(nameof(RewriteTarget.Method))!;

@@ -8,5 +8,5 @@ internal static class PrepatcherCompatibility {
 
     internal static bool IsActive() => ModLister.GetActiveModWithIdentifier(PackageId, ignorePostfix: true) != null;
 
-    internal static readonly Type BuiltinFreePatchTypeToSkip = typeof(AssemblyLoadingFreePatch);
+    internal static readonly Type BuiltinRewriteTypeToSkip = typeof(AssemblyLoadingRewrite);
 }

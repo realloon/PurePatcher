@@ -18,7 +18,7 @@ internal class TestPatches : Test {
         ]);
 
         MethodReplacer.RunReplacements(Set);
-        FreePatcher.RunPatches(Set, "TestAssemblyTarget");
+        AssemblyRewriter.RunRewrites(Set, "TestAssemblyTarget");
         Reloader.Reload(Set, LoadAssembly);
     }
 
@@ -106,8 +106,8 @@ internal class TestPatches : Test {
     }
 
     [Test]
-    public void TestFreePatching() {
-        Assert.That(FreePatching.TestRewriteTargetMethod(), Is.EqualTo(1));
+    public void TestAssemblyRewriting() {
+        Assert.That(AssemblyRewriting.TestRewriteTargetMethod(), Is.EqualTo(1));
     }
 
     [Test]

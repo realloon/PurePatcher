@@ -54,7 +54,7 @@ internal class Test {
         );
     }
 
-    // Load the test assemblies and make them resolvable for FreePatch testing
+    // Load the test assemblies and make them resolvable for assembly rewrite testing.
     private static (Assembly Test, Assembly Target) LoadLiveAsms() {
         const string testAssemblyNewName = "TestAssembly1";
         const string testAssemblyTargetNewName = "TestAssemblyTarget1";
