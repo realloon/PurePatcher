@@ -1,6 +1,5 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using MonoMod.Utils;
 using PurePatcher.Annotations;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
@@ -25,8 +24,8 @@ internal partial class FieldAdder(AssemblySet set) {
     internal void ProcessAccessor(MethodDefinition accessor) {
         if (CheckFieldAccessor(accessor) is { } error) {
             var accessorAsm = set.FindAssembly(accessor.DeclaringType);
-            Logger.Error($"{accessorAsm}: {error} for new field with accessor {accessor.MemberFullName()}");
-            return;
+            throw new InvalidOperationException(
+                $"{accessorAsm}: {error} for new field with accessor {accessor.MemberFullName()}");
         }
 
         var newField = AddFieldToTarget(accessor);
@@ -105,12 +104,7 @@ internal partial class FieldAdder(AssemblySet set) {
 
     private static TypeReference ImportFieldTypeIntoTargetModule(MethodDefinition accessor) {
         var targetType = FirstParameterTypeResolved(accessor)!;
-        var fieldType = FieldType(accessor);
-        return targetType.Module.ImportReference(
-            fieldType,
-            DummyMethodReference.Create(accessor.Name, targetType.Module.ImportReference(accessor.DeclaringType),
-                targetType.GenericParameters)
-        );
+        return targetType.Module.ImportReference(FieldType(accessor));
     }
 
     private static TypeDefinition? FirstParameterTypeResolved(MethodDefinition methodDef) {
@@ -127,21 +121,4 @@ internal partial class FieldAdder(AssemblySet set) {
         .SelectMany(t => t.Methods, (t, m) => new { t, m })
         .Where(t1 => t1.m.HasCustomAttribute(typeof(AddFieldAttribute).FullName!))
         .Select(t1 => t1.m);
-}
-
-internal sealed class DummyMethodReference : MethodReference {
-    public override Collection<GenericParameter> GenericParameters { get; }
-
-    private DummyMethodReference(Collection<GenericParameter> genericParameters) {
-        GenericParameters = genericParameters;
-    }
-
-    public static DummyMethodReference Create(string name, TypeReference declaringType,
-        Collection<GenericParameter> genericParameters) {
-        var reference = new DummyMethodReference(genericParameters) {
-            Name = name,
-            DeclaringType = declaringType
-        };
-        return reference;
-    }
 }

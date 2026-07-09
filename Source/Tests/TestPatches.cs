@@ -27,9 +27,6 @@ internal class TestPatches : Test {
         Assert.Multiple(() => {
             Assert.That(NewFields.TestIntField(1), Is.EqualTo(1));
             Assert.That(NewFields.TestIntStructField(1), Is.EqualTo(1));
-            Assert.That(NewFields.TestGenericField1("test1"), Is.EqualTo("test1"));
-            Assert.That(NewFields.TestGenericField2("test2"), Is.EqualTo("test2"));
-            Assert.That(NewFields.TestGenericField3("test3"), Is.EqualTo("test3"));
         });
     }
 

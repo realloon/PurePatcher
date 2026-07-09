@@ -17,8 +17,9 @@ internal partial class FieldAdder {
             return "Target type can't be an interface";
         }
 
-        if (!GenericArgumentsOf(accessor.Parameters.First().ParameterType).SequenceEqual(accessor.GenericParameters)) {
-            return "The generic arguments of the target type don't match the generic parameters of the accessor";
+        if (accessor.DeclaringType.HasGenericParameters || accessor.HasGenericParameters ||
+            target.HasGenericParameters || FieldType(accessor).ContainsGenericParameter) {
+            return "AddField declarations cannot contain unbound generic parameters";
         }
 
         if (!set.FindAssembly(target)!.AllowPatches) {
@@ -32,9 +33,5 @@ internal partial class FieldAdder {
         }
 
         return accessor.ReturnType.IsByReference ? "Component-bound field cannot have a setter" : null;
-    }
-
-    private static IEnumerable<TypeReference> GenericArgumentsOf(TypeReference t) {
-        return t is GenericInstanceType gType ? gType.GenericArguments : Enumerable.Empty<TypeReference>();
     }
 }
