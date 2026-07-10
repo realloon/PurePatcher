@@ -1,3 +1,4 @@
+using System.Collections;
 using HarmonyLib;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -38,60 +39,173 @@ internal partial class FieldAdder {
         _injectionSites[(targetType, compType)] = (method, listField);
     }
 
-    private void PatchInjectionSite(MethodDefinition accessor, FieldDefinition newField) {
-        Logger.Verbose("Patching the component initialization site for injection");
+    private void PatchInjectionSites(
+        IReadOnlyCollection<(MethodDefinition Accessor, FieldDefinition Field)> injections) {
+        foreach (var site in injections.GroupBy(injection => GetInjectionSite(injection.Accessor)!.Value)) {
+            var (initMethod, listField) = site.Key;
+            PatchInjectionSite(initMethod, listField, site.Select(injection => injection.Field).ToArray());
+        }
+    }
 
-        var (initMethod, listField) = GetInjectionSite(accessor)!.Value;
+    private static void PatchInjectionSite(MethodDefinition initMethod, FieldDefinition listField,
+        FieldDefinition[] fields) {
+        Logger.Verbose($"Patching {initMethod.FullName} for {fields.Length} component bindings");
+
         var body = initMethod.Body;
-        var targetType = initMethod.Module.ImportReference(newField.DeclaringType);
+        var module = initMethod.Module;
+        var il = body.GetILProcessor();
 
-        // Set to null in the prefix
-        var clearField = Instruction.Create(OpCodes.Nop);
-        var clearDone = Instruction.Create(OpCodes.Nop);
-        Instruction[] clearInstructions = [
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(OpCodes.Isinst, targetType),
-            Instruction.Create(OpCodes.Dup),
-            Instruction.Create(OpCodes.Brtrue_S, clearField),
-            Instruction.Create(OpCodes.Pop),
-            Instruction.Create(OpCodes.Br_S, clearDone),
-            clearField,
-            Instruction.Create(OpCodes.Ldnull),
-            Instruction.Create(OpCodes.Stfld, newField),
-            clearDone
-        ];
+        // Cache each applicable target cast once so all bindings at this site can share one list scan.
+        var targetGroups = fields
+            .GroupBy(field => field.DeclaringType)
+            .Select(group => {
+                var type = module.ImportReference(group.Key);
+                var alwaysApplies = initMethod.DeclaringType.BaseTypesAndSelfResolved().Contains(group.Key);
+                return (Type: type, Fields: group.ToArray(), Variable: new VariableDefinition(type),
+                    AlwaysApplies: alwaysApplies);
+            })
+            .ToArray();
 
-        for (var i = 0; i < clearInstructions.Length; i++) {
-            body.Instructions.Insert(i, clearInstructions[i]);
+        var listVariable = new VariableDefinition(module.ImportReference(typeof(IList)));
+        // A mod component type in the game's local-variable signature can cause circular type loading on Mono.
+        var componentVariable = new VariableDefinition(module.TypeSystem.Object);
+        var indexVariable = new VariableDefinition(module.TypeSystem.Int32);
+        var remainingVariable = new VariableDefinition(module.TypeSystem.Int32);
+        var clearMethod = module.ImportReference(
+            AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.Clear)));
+
+        body.InitLocals = true;
+        body.Variables.Add(listVariable);
+        body.Variables.Add(componentVariable);
+        body.Variables.Add(indexVariable);
+        body.Variables.Add(remainingVariable);
+
+        foreach (var target in targetGroups) {
+            body.Variables.Add(target.Variable);
         }
 
-        var retInst = body.Instructions.Last();
-        body.Instructions.Remove(retInst);
-
-        // Inject in the postfix
-        body.GetILProcessor().Emit(OpCodes.Ldarg_0);
-        body.GetILProcessor().Emit(OpCodes.Isinst, targetType);
-        body.GetILProcessor().Emit(OpCodes.Dup);
-
-        var injectField = Instruction.Create(OpCodes.Nop);
-        var injectDone = Instruction.Create(OpCodes.Nop);
-        body.GetILProcessor().Emit(OpCodes.Brtrue_S, injectField);
-        body.GetILProcessor().Emit(OpCodes.Pop);
-        body.GetILProcessor().Emit(OpCodes.Br_S, injectDone);
-        body.GetILProcessor().Append(injectField);
-        body.GetILProcessor().Emit(OpCodes.Ldflda, newField);
-        body.GetILProcessor().Emit(OpCodes.Ldarg_0);
-        body.GetILProcessor().Emit(OpCodes.Ldfld, listField);
-        body.GetILProcessor().Emit(
-            OpCodes.Call,
-            new GenericInstanceMethod(initMethod.Module.ImportReference(
-                AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.TryInject)))) {
-                GenericArguments = { newField.FieldType }
+        List<Instruction> prefix = [];
+        foreach (var target in targetGroups) {
+            prefix.Add(Instruction.Create(OpCodes.Ldarg_0));
+            if (!target.AlwaysApplies) {
+                prefix.Add(Instruction.Create(OpCodes.Isinst, target.Type));
             }
-        );
-        body.GetILProcessor().Append(injectDone);
+            prefix.Add(Instruction.Create(OpCodes.Stloc, target.Variable));
 
-        body.Instructions.Add(retInst);
+            var nextTarget = Instruction.Create(OpCodes.Nop);
+            if (!target.AlwaysApplies) {
+                prefix.Add(Instruction.Create(OpCodes.Ldloc, target.Variable));
+                prefix.Add(Instruction.Create(OpCodes.Brfalse, nextTarget));
+            }
+
+            foreach (var field in target.Fields) {
+                var clear = new GenericInstanceMethod(clearMethod) {
+                    GenericArguments = { target.Type, field.FieldType }
+                };
+                prefix.Add(target.AlwaysApplies
+                    ? Instruction.Create(OpCodes.Ldarg_0)
+                    : Instruction.Create(OpCodes.Ldloc, target.Variable));
+                prefix.Add(Instruction.Create(OpCodes.Ldflda, field));
+                prefix.Add(target.AlwaysApplies
+                    ? Instruction.Create(OpCodes.Ldarg_0)
+                    : Instruction.Create(OpCodes.Ldloc, target.Variable));
+                prefix.Add(Instruction.Create(OpCodes.Call, clear));
+            }
+
+            if (!target.AlwaysApplies) {
+                prefix.Add(nextTarget);
+            }
+        }
+
+        for (var i = 0; i < prefix.Count; i++) {
+            body.Instructions.Insert(i, prefix[i]);
+        }
+
+        var ret = body.Instructions.Last();
+        body.Instructions.Remove(ret);
+
+        var done = Instruction.Create(OpCodes.Nop);
+        var loopBody = Instruction.Create(OpCodes.Nop);
+        var loopCheck = Instruction.Create(OpCodes.Nop);
+        var countGetter = module.ImportReference(
+            AccessTools.PropertyGetter(typeof(ICollection), nameof(ICollection.Count)));
+        var itemGetter = module.ImportReference(AccessTools.PropertyGetter(typeof(IList), "Item"));
+
+        il.Emit(OpCodes.Ldarg_0);
+        il.Emit(OpCodes.Ldfld, listField);
+        il.Emit(OpCodes.Stloc, listVariable);
+        il.Emit(OpCodes.Ldloc, listVariable);
+        il.Emit(OpCodes.Brfalse, done);
+        il.Emit(OpCodes.Ldc_I4_0);
+        il.Emit(OpCodes.Stloc, remainingVariable);
+
+        foreach (var target in targetGroups) {
+            var nextTarget = Instruction.Create(OpCodes.Nop);
+            il.Emit(OpCodes.Ldloc, target.Variable);
+            il.Emit(OpCodes.Brfalse, nextTarget);
+            il.Emit(OpCodes.Ldloc, remainingVariable);
+            il.Emit(OpCodes.Ldc_I4, target.Fields.Length);
+            il.Emit(OpCodes.Add);
+            il.Emit(OpCodes.Stloc, remainingVariable);
+            il.Append(nextTarget);
+        }
+
+        il.Emit(OpCodes.Ldloc, remainingVariable);
+        il.Emit(OpCodes.Brfalse, done);
+        il.Emit(OpCodes.Ldc_I4_0);
+        il.Emit(OpCodes.Stloc, indexVariable);
+        il.Emit(OpCodes.Br, loopCheck);
+        il.Append(loopBody);
+        il.Emit(OpCodes.Ldloc, listVariable);
+        il.Emit(OpCodes.Ldloc, indexVariable);
+        il.Emit(OpCodes.Callvirt, itemGetter);
+        il.Emit(OpCodes.Stloc, componentVariable);
+
+        foreach (var target in targetGroups) {
+            var nextTarget = Instruction.Create(OpCodes.Nop);
+            il.Emit(OpCodes.Ldloc, target.Variable);
+            il.Emit(OpCodes.Brfalse, nextTarget);
+
+            foreach (var field in target.Fields) {
+                var nextField = Instruction.Create(OpCodes.Nop);
+                var noMatch = Instruction.Create(OpCodes.Nop);
+
+                il.Emit(OpCodes.Ldloc, target.Variable);
+                il.Emit(OpCodes.Ldfld, field);
+                il.Emit(OpCodes.Brtrue, nextField);
+                il.Emit(OpCodes.Ldloc, target.Variable);
+                il.Emit(OpCodes.Ldloc, componentVariable);
+                il.Emit(OpCodes.Isinst, field.FieldType);
+                il.Emit(OpCodes.Dup);
+                il.Emit(OpCodes.Brfalse, noMatch);
+                il.Emit(OpCodes.Stfld, field);
+                il.Emit(OpCodes.Ldloc, remainingVariable);
+                il.Emit(OpCodes.Ldc_I4_1);
+                il.Emit(OpCodes.Sub);
+                il.Emit(OpCodes.Stloc, remainingVariable);
+                il.Emit(OpCodes.Ldloc, remainingVariable);
+                il.Emit(OpCodes.Brfalse, done);
+                il.Emit(OpCodes.Br, nextField);
+                il.Append(noMatch);
+                il.Emit(OpCodes.Pop);
+                il.Emit(OpCodes.Pop);
+                il.Append(nextField);
+            }
+
+            il.Append(nextTarget);
+        }
+
+        il.Emit(OpCodes.Ldloc, indexVariable);
+        il.Emit(OpCodes.Ldc_I4_1);
+        il.Emit(OpCodes.Add);
+        il.Emit(OpCodes.Stloc, indexVariable);
+        il.Append(loopCheck);
+        il.Emit(OpCodes.Ldloc, indexVariable);
+        il.Emit(OpCodes.Ldloc, listVariable);
+        il.Emit(OpCodes.Callvirt, countGetter);
+        il.Emit(OpCodes.Blt, loopBody);
+        il.Append(done);
+        body.Instructions.Add(ret);
     }
 
     // Find the unique (component owner type, component type) pair for this accessor and then

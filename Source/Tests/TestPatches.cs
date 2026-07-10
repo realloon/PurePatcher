@@ -36,6 +36,7 @@ internal class TestPatches : Test {
             Assert.That(Injections.TestOtherCompInjection(), Is.True);
             Assert.That(Injections.TestCompInjection(), Is.True);
             Assert.That(Injections.TestCompInjection_DoubleInit(), Is.True);
+            Assert.That(Injections.TestCompInjection_ClearedOnReinit(), Is.True);
             Assert.That(Injections.TestCompBaseInjection(), Is.True);
             Assert.That(Injections.TestCompInjectionOnSubType(), Is.True);
             Assert.That(Injections.TestCompBaseInjectionOnSubType(), Is.True);
@@ -43,6 +44,20 @@ internal class TestPatches : Test {
             Assert.That(Injections.TestNullCompsInjection(), Is.True);
             Assert.That(Injections.TestNullableCompsInjection(), Is.True);
         });
+    }
+
+    [Test]
+    public void TestComponentBindingsAreBatched() {
+        var initMethod = TargetAsm.ModuleDefinition
+            .GetType($"{nameof(TestAssemblyTarget)}.{nameof(BaseWithComps)}")
+            .Methods.Single(method => method.Name == nameof(BaseWithComps.InitComps));
+        var listReads = initMethod.Body.Instructions
+            .Select(instruction => instruction.Operand)
+            .OfType<MethodReference>()
+            .Count(reference => reference.DeclaringType.FullName == typeof(System.Collections.IList).FullName &&
+                                reference.Name == "get_Item");
+
+        Assert.That(listReads, Is.EqualTo(1));
     }
 
     [Test]

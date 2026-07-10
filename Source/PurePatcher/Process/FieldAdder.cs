@@ -9,19 +9,27 @@ using MethodImplAttributes = Mono.Cecil.MethodImplAttributes;
 namespace PurePatcher.Process;
 
 internal partial class FieldAdder(AssemblySet set) {
-    internal void ProcessAllAssemblies() {
-        foreach (var asm in set.AllAssemblies.Where(a => a.ProcessAttributes)) {
-            ProcessTypes(asm.ModuleDefinition.Types);
+    internal void ProcessAllAssemblies() => ProcessTypes(set.AllAssemblies
+        .Where(asm => asm.ProcessAttributes)
+        .SelectMany(asm => asm.ModuleDefinition.Types));
+
+    internal void ProcessTypes(IEnumerable<TypeDefinition> inTypes) =>
+        ProcessAccessors(GetAllAddFieldAccessors(inTypes));
+
+    internal void ProcessAccessor(MethodDefinition accessor) => ProcessAccessors([accessor]);
+
+    private void ProcessAccessors(IEnumerable<MethodDefinition> accessors) {
+        List<(MethodDefinition Accessor, FieldDefinition Field)> injections = [];
+
+        foreach (var accessor in accessors) {
+            ProcessAccessor(accessor, injections);
         }
+
+        PatchInjectionSites(injections);
     }
 
-    internal void ProcessTypes(IEnumerable<TypeDefinition> inTypes) {
-        foreach (var accessor in GetAllAddFieldAccessors(inTypes)) {
-            ProcessAccessor(accessor);
-        }
-    }
-
-    internal void ProcessAccessor(MethodDefinition accessor) {
+    private void ProcessAccessor(MethodDefinition accessor,
+        ICollection<(MethodDefinition Accessor, FieldDefinition Field)> injections) {
         if (CheckFieldAccessor(accessor) is { } error) {
             var accessorAsm = set.FindAssembly(accessor.DeclaringType);
             throw new InvalidOperationException(
@@ -32,7 +40,7 @@ internal partial class FieldAdder(AssemblySet set) {
         PatchAccessor(accessor, newField);
 
         if (HasInjection(accessor)) {
-            PatchInjectionSite(accessor, newField);
+            injections.Add((accessor, newField));
         }
 
         if (GetExplicitDefaultValue(accessor) is { } attr) {

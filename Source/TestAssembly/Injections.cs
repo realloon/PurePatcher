@@ -58,6 +58,16 @@ public static class Injections {
         return thing.MyComp() == thing.comps[0];
     }
 
+    public static bool TestCompInjection_ClearedOnReinit() {
+        var thing = new BaseWithComps { CompTypes = [typeof(DerivedMyComponent)] };
+        thing.InitComps();
+        if (thing.MyComp() == null) return false;
+
+        thing.CompTypes = [typeof(OtherComp)];
+        thing.InitComps();
+        return thing.MyComp() == null;
+    }
+
     // Sub comp type, initializer type == target type
     public static bool TestCompBaseInjection() {
         var thing = new BaseWithComps { CompTypes = [typeof(DerivedMyComponent), typeof(OtherComp)] };
