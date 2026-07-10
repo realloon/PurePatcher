@@ -36,15 +36,21 @@ internal static class AssemblyRewriter {
         }
     }
 
-    private static bool InvokeRewriter(MethodInfo rewriter, ModuleDefinition moduleToRewrite) {
+    internal static bool InvokeRewriter(MethodInfo rewriter, ModuleDefinition moduleToRewrite) {
         try {
             var ret = rewriter.Invoke(null, [moduleToRewrite]);
             return ret == null || (bool)ret;
+        } catch (TargetInvocationException e) when (e.InnerException != null) {
+            throw RewriteFailure(rewriter, e.InnerException);
         } catch (Exception e) {
-            Logger.Error($"Exception running assembly rewrite {rewriter.FullDescription()}: {e}");
-            return false;
+            throw RewriteFailure(rewriter, e);
         }
     }
+
+    private static InvalidOperationException RewriteFailure(MethodInfo rewriter, Exception cause) => new(
+        $"Assembly rewrite {rewriter.Module.Assembly.GetName().Name}:{rewriter.FullDescription()} failed",
+        cause
+    );
 
     private static bool IsDefinedSafe<T>(ICustomAttributeProvider provider) where T : Attribute {
         try {
