@@ -71,8 +71,6 @@ internal partial class FieldAdder {
         var componentVariable = new VariableDefinition(module.TypeSystem.Object);
         var indexVariable = new VariableDefinition(module.TypeSystem.Int32);
         var remainingVariable = new VariableDefinition(module.TypeSystem.Int32);
-        var clearMethod = module.ImportReference(
-            AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.Clear)));
 
         body.InitLocals = true;
         body.Variables.Add(listVariable);
@@ -99,17 +97,11 @@ internal partial class FieldAdder {
             }
 
             foreach (var field in target.Fields) {
-                var clear = new GenericInstanceMethod(clearMethod) {
-                    GenericArguments = { target.Type, field.FieldType }
-                };
                 prefix.Add(target.AlwaysApplies
                     ? Instruction.Create(OpCodes.Ldarg_0)
                     : Instruction.Create(OpCodes.Ldloc, target.Variable));
-                prefix.Add(Instruction.Create(OpCodes.Ldflda, field));
-                prefix.Add(target.AlwaysApplies
-                    ? Instruction.Create(OpCodes.Ldarg_0)
-                    : Instruction.Create(OpCodes.Ldloc, target.Variable));
-                prefix.Add(Instruction.Create(OpCodes.Call, clear));
+                prefix.Add(Instruction.Create(OpCodes.Ldnull));
+                prefix.Add(Instruction.Create(OpCodes.Stfld, field));
             }
 
             if (!target.AlwaysApplies) {
