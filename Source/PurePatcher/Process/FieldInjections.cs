@@ -41,44 +41,55 @@ internal partial class FieldAdder {
     private void PatchInjectionSite(MethodDefinition accessor, FieldDefinition newField) {
         Logger.Verbose("Patching the component initialization site for injection");
 
-        // ldtoken newfield
-        // ldarg 0
-        // ldarg 0
-        // ldfld complist
-        // call InjectionHelper.TryInject
-
         var (initMethod, listField) = GetInjectionSite(accessor)!.Value;
-
         var body = initMethod.Body;
+        var targetType = initMethod.Module.ImportReference(newField.DeclaringType);
 
         // Set to null in the prefix
-        body.Instructions.Insert(0, Instruction.Create(OpCodes.Ldarg_0));
-        body.Instructions.Insert(1, Instruction.Create(OpCodes.Ldflda, newField));
-        body.Instructions.Insert(2, Instruction.Create(OpCodes.Ldarg_0));
-        body.Instructions.Insert(3, Instruction.Create(
-            OpCodes.Call,
-            new GenericInstanceMethod(initMethod.Module.ImportReference(
-                AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.Clear)))) {
-                GenericArguments = { newField.DeclaringType, newField.FieldType }
-            }
-        ));
+        var clearField = Instruction.Create(OpCodes.Nop);
+        var clearDone = Instruction.Create(OpCodes.Nop);
+        Instruction[] clearInstructions = [
+            Instruction.Create(OpCodes.Ldarg_0),
+            Instruction.Create(OpCodes.Isinst, targetType),
+            Instruction.Create(OpCodes.Dup),
+            Instruction.Create(OpCodes.Brtrue_S, clearField),
+            Instruction.Create(OpCodes.Pop),
+            Instruction.Create(OpCodes.Br_S, clearDone),
+            clearField,
+            Instruction.Create(OpCodes.Ldnull),
+            Instruction.Create(OpCodes.Stfld, newField),
+            clearDone
+        ];
+
+        for (var i = 0; i < clearInstructions.Length; i++) {
+            body.Instructions.Insert(i, clearInstructions[i]);
+        }
 
         var retInst = body.Instructions.Last();
         body.Instructions.Remove(retInst);
 
         // Inject in the postfix
         body.GetILProcessor().Emit(OpCodes.Ldarg_0);
+        body.GetILProcessor().Emit(OpCodes.Isinst, targetType);
+        body.GetILProcessor().Emit(OpCodes.Dup);
+
+        var injectField = Instruction.Create(OpCodes.Nop);
+        var injectDone = Instruction.Create(OpCodes.Nop);
+        body.GetILProcessor().Emit(OpCodes.Brtrue_S, injectField);
+        body.GetILProcessor().Emit(OpCodes.Pop);
+        body.GetILProcessor().Emit(OpCodes.Br_S, injectDone);
+        body.GetILProcessor().Append(injectField);
         body.GetILProcessor().Emit(OpCodes.Ldflda, newField);
-        body.GetILProcessor().Emit(OpCodes.Ldarg_0);
         body.GetILProcessor().Emit(OpCodes.Ldarg_0);
         body.GetILProcessor().Emit(OpCodes.Ldfld, listField);
         body.GetILProcessor().Emit(
             OpCodes.Call,
             new GenericInstanceMethod(initMethod.Module.ImportReference(
                 AccessTools.Method(typeof(InjectionHelper), nameof(InjectionHelper.TryInject)))) {
-                GenericArguments = { newField.DeclaringType, newField.FieldType }
+                GenericArguments = { newField.FieldType }
             }
         );
+        body.GetILProcessor().Append(injectDone);
 
         body.Instructions.Add(retInst);
     }
