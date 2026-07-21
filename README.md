@@ -24,7 +24,7 @@ Add the annotation package to your `.csproj`:
 </ItemGroup>
 ```
 
-Like Harmony, PurePatcher requires runtime support from the PurePatcher mod.
+Like Harmony, PurePatcher requires runtime support from the [PurePatcher mod](https://steamcommunity.com/sharedfiles/filedetails/?id=3755504957).
 
 Declare the dependency in your `About.xml`:
 
@@ -51,7 +51,7 @@ public static class RefuelablePatch {
 
     [ReplaceMethod(typeof(CompRefuelable), nameof(CompRefuelable.CompInspectStringExtra))]
     public static string CompInspectStringExtra(CompRefuelable comp) {
-        comp.InspectCount()++;
+        comp.InspectCount() += 1;
         return $"{comp.Props.FuelLabel}: {comp.Fuel} ({comp.InspectCount()})";
     }
 }
