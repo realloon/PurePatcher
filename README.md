@@ -14,7 +14,7 @@ It provides an annotation package for mod projects, and a runtime mod that appli
 
 Rewrites are applied only at load time, and patched code has no persistent runtime overhead.
 
-## Use
+## Usage
 
 Add the annotation package to your `.csproj`:
 
@@ -37,6 +37,8 @@ Declare the dependency in your `About.xml`:
   </li>
 </modDependencies>
 ```
+
+For documentation on using the `PurePatcher.Annotations` API, see the [PurePatcher wiki](https://github.com/realloon/PurePatcher/wiki).
 
 ## Example
 
