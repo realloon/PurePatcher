@@ -12,8 +12,7 @@ internal static class Util {
             return "Resources/Data/Managed";
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
             return "Managed";
         }
 
@@ -28,20 +27,14 @@ internal static class Util {
     }
 
     public static IEnumerable<T> Bfs<T>(IEnumerable<T> start, Func<T, IEnumerable<T>> next) {
-        var result = new HashSet<T>();
-        var todo = new Queue<T>();
-
-        foreach (var o in start)
-            todo.Enqueue(o);
+        var result = new HashSet<T>(start);
+        var todo = new Queue<T>(result);
 
         while (todo.Count > 0) {
-            var t = todo.Dequeue();
-            result.Add(t);
-
-            foreach (var d in next(t)) {
-                if (result.Contains(d)) continue;
-
-                todo.Enqueue(d);
+            foreach (var d in next(todo.Dequeue())) {
+                if (result.Add(d)) {
+                    todo.Enqueue(d);
+                }
             }
         }
 

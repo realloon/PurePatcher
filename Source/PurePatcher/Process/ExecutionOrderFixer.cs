@@ -19,7 +19,7 @@ internal static class ExecutionOrderFixer {
             (typeof(Root), -30),
             (typeof(Root_Entry), -29),
             (typeof(Root_Play), -28),
-            (AccessTools.TypeByName("RuntimeAudioClipLoader.Manager") ?? null, -70)
+            (AccessTools.TypeByName("RuntimeAudioClipLoader.Manager"), -70)
         };
 
         var attrCtor = asmCSharp.ImportReference(
