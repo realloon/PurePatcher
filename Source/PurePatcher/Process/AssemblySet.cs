@@ -46,15 +46,18 @@ public class AssemblySet {
     internal Dictionary<ModifiableAssembly, HashSet<ModifiableAssembly>> AllAssembliesToDependants() {
         var dependants = new Dictionary<ModifiableAssembly, HashSet<ModifiableAssembly>>();
 
-        foreach (var asm in _nameToAsm.Values)
-        foreach (var reference in asm.ModuleDefinition.AssemblyReferences) {
-            var refAsm = FindAssembly(reference.Name);
-            if (refAsm == null) continue;
+        foreach (var asm in _nameToAsm.Values) {
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var reference in asm.ModuleDefinition.AssemblyReferences) {
+                var refAsm = FindAssembly(reference.Name);
+                if (refAsm == null) continue;
 
-            if (!dependants.TryGetValue(refAsm, out var set))
-                dependants[refAsm] = set = [];
+                if (!dependants.TryGetValue(refAsm, out var set)) {
+                    dependants[refAsm] = set = [];
+                }
 
-            set.Add(asm);
+                set.Add(asm);
+            }
         }
 
         return dependants;

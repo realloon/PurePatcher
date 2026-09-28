@@ -88,6 +88,7 @@ internal partial class FieldAdder {
             if (!target.AlwaysApplies) {
                 prefix.Add(Instruction.Create(OpCodes.Isinst, target.Type));
             }
+
             prefix.Add(Instruction.Create(OpCodes.Stloc, target.Variable));
 
             var nextTarget = Instruction.Create(OpCodes.Nop);

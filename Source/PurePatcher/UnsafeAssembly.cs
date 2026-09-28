@@ -27,8 +27,9 @@ internal static class UnsafeAssembly {
     }
 
     internal static unsafe byte[] GetRawData(Assembly asm) {
-        if (MonoAssemblyField == null)
+        if (MonoAssemblyField == null) {
             throw new Exception("Not available on non-Mono runtime");
+        }
 
         var image = *(long*)((IntPtr)MonoAssemblyField.GetValue(asm) + 0x60);
         var rawData = *(long*)((IntPtr)image + 0x10);

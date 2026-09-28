@@ -60,18 +60,17 @@ internal static class MethodReplacer {
             .Where(target => MethodMatchesReplacement(target, targetMethodName, replacement))
             .ToArray();
 
-        if (matches.Length == 0) {
-            throw new InvalidOperationException(
-                $"Could not find target method {targetType.FullName}.{targetMethodName} matching {replacement.MemberFullName()}.");
+        switch (matches.Length) {
+            case 0:
+                throw new InvalidOperationException(
+                    $"Could not find target method {targetType.FullName}.{targetMethodName} matching {replacement.MemberFullName()}.");
+            case > 1:
+                throw new InvalidOperationException(
+                    $"Ambiguous target method {targetType.FullName}.{targetMethodName} matching {replacement.MemberFullName()}.");
+            default:
+                ValidateTargetMethod(matches[0], replacement);
+                return matches[0];
         }
-
-        if (matches.Length > 1) {
-            throw new InvalidOperationException(
-                $"Ambiguous target method {targetType.FullName}.{targetMethodName} matching {replacement.MemberFullName()}.");
-        }
-
-        ValidateTargetMethod(matches[0], replacement);
-        return matches[0];
     }
 
     private static bool MethodMatchesReplacement(MethodDefinition target, string targetMethodName,
@@ -266,7 +265,9 @@ internal static class MethodReplacer {
 
     private static bool HasGenericParameters(TypeReference type) {
         while (type != null) {
-            if (type.HasGenericParameters) return true;
+            if (type.HasGenericParameters) {
+                return true;
+            }
 
             type = type.DeclaringType;
         }

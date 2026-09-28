@@ -14,8 +14,9 @@ public static class AssemblyLoadingRewrite {
                      throw new MissingMethodException(type.FullName, nameof(ModAssemblyHandler.ReloadAll));
 
         foreach (var inst in method.Body.Instructions) {
-            if (inst.Operand is MethodReference { Name: nameof(Assembly.LoadFrom) })
+            if (inst.Operand is MethodReference { Name: nameof(Assembly.LoadFrom) }) {
                 inst.Operand = module.ImportReference(typeof(AssemblyLoadingRewrite).GetMethod(nameof(LoadFrom)));
+            }
         }
     }
 
@@ -24,7 +25,9 @@ public static class AssemblyLoadingRewrite {
         var asmWithName = AppDomain.CurrentDomain.GetAssemblies()
             .FirstOrDefault(a => a.GetName().Name == asmName.Name);
 
-        if (asmWithName != null) return asmWithName;
+        if (asmWithName != null) {
+            return asmWithName;
+        }
 
         var rawAssembly = File.ReadAllBytes(filePath);
         var fileInfo = new FileInfo(Path.ChangeExtension(filePath, ".pdb"));

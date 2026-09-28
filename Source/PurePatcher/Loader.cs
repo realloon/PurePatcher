@@ -5,6 +5,8 @@ using Verse;
 using Verse.Steam;
 using PurePatcher.Process;
 
+// ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+
 namespace PurePatcher;
 
 internal static class Loader {
