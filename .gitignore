@@ -10,5 +10,5 @@ Assemblies/
 **.user
 
 # Rider
-Source/.idea/.idea.PurePatcher/.idea/workspace.xml
-Source/.idea/.idea.PurePatcher/.idea/projectSettingsUpdater.xml
+**/.idea/workspace.xml
+**/.idea/projectSettingsUpdater.xml
