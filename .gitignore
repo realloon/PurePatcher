@@ -3,6 +3,7 @@
 
 # Dist
 Assemblies/
+!1.6/Assemblies
 
 # Source
 **/bin/
