@@ -6,6 +6,7 @@ using FieldAttributes = Mono.Cecil.FieldAttributes;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using MethodBody = Mono.Cecil.Cil.MethodBody;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
+using CustomAttributeNamedArgument = Mono.Cecil.CustomAttributeNamedArgument;
 
 namespace PurePatcher.Runtime;
 
@@ -117,6 +118,64 @@ internal static class AssemblyInjection {
         MethodBodyImporter.ReplaceString(method, BootGuardTemplate.PackageIdPlaceholder, packageId);
 
         CallFromModuleInitializer(module, method);
+    }
+
+    // Rewritten bodies run inside Assembly-CSharp, so anything they call in a mod assembly has to be
+    // reachable from there even when the mod declared it private.
+    internal static void InjectAccessCheckExemptions(ModuleDefinition module, IEnumerable<string> assemblyNames) {
+        var attributeType = new TypeDefinition("System.Runtime.CompilerServices",
+            "IgnoresAccessChecksToAttribute",
+            TypeAttributes.NotPublic | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,
+            module.ImportReference(typeof(Attribute)));
+        module.Types.Add(attributeType);
+
+        var usage = new CustomAttribute(module.ImportReference(
+            typeof(AttributeUsageAttribute).GetConstructor([typeof(AttributeTargets)])!));
+        usage.ConstructorArguments.Add(new CustomAttributeArgument(
+            module.ImportReference(typeof(AttributeTargets)), (int)AttributeTargets.Assembly));
+        usage.Properties.Add(new CustomAttributeNamedArgument(nameof(AttributeUsageAttribute.AllowMultiple),
+            new CustomAttributeArgument(module.TypeSystem.Boolean, true)));
+        attributeType.CustomAttributes.Add(usage);
+
+        var nameField = new FieldDefinition("AssemblyName", FieldAttributes.Private | FieldAttributes.InitOnly,
+            module.TypeSystem.String);
+        attributeType.Fields.Add(nameField);
+
+        var ctor = new MethodDefinition(".ctor",
+            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName |
+            MethodAttributes.RTSpecialName, module.TypeSystem.Void);
+        ctor.Parameters.Add(new ParameterDefinition("assemblyName", Mono.Cecil.ParameterAttributes.None,
+            module.TypeSystem.String));
+        attributeType.Methods.Add(ctor);
+
+        var ctorIl = ctor.Body.GetILProcessor();
+        ctorIl.Emit(OpCodes.Ldarg_0);
+        ctorIl.Emit(OpCodes.Call, module.ImportReference(typeof(Attribute).GetConstructor(
+            BindingFlags.Instance | BindingFlags.NonPublic, null, Type.EmptyTypes, null)!));
+        ctorIl.Emit(OpCodes.Ldarg_0);
+        ctorIl.Emit(OpCodes.Ldarg_1);
+        ctorIl.Emit(OpCodes.Stfld, nameField);
+        ctorIl.Emit(OpCodes.Ret);
+
+        var property = new PropertyDefinition("AssemblyName", Mono.Cecil.PropertyAttributes.None,
+            module.TypeSystem.String);
+        var getter = new MethodDefinition("get_AssemblyName",
+            MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName,
+            module.TypeSystem.String);
+        attributeType.Methods.Add(getter);
+
+        var getterIl = getter.Body.GetILProcessor();
+        getterIl.Emit(OpCodes.Ldarg_0);
+        getterIl.Emit(OpCodes.Ldfld, nameField);
+        getterIl.Emit(OpCodes.Ret);
+        property.GetMethod = getter;
+        attributeType.Properties.Add(property);
+
+        foreach (var assemblyName in assemblyNames.Distinct()) {
+            module.Assembly.CustomAttributes.Add(new CustomAttribute(ctor) {
+                ConstructorArguments = { new CustomAttributeArgument(module.TypeSystem.String, assemblyName) }
+            });
+        }
     }
 
     private static void CallFromModuleInitializer(ModuleDefinition module, MethodDefinition method) {
