@@ -39,6 +39,9 @@ internal static class AssemblyInjection {
     internal static void InjectRedirect(ModuleDefinition module, string cacheFolder) {
         var type = CreateHolderType(module, ReloadRedirectType);
 
+        type.Fields.Add(new FieldDefinition("Loaded", FieldAttributes.Public | FieldAttributes.Static,
+            module.ImportReference(typeof(Dictionary<string, Assembly>))));
+
         var cachedFileName = new MethodDefinition("CachedFileName", MethodAttributes.Public | MethodAttributes.Static,
             module.TypeSystem.String);
         cachedFileName.Parameters.Add(new ParameterDefinition("filePath", Mono.Cecil.ParameterAttributes.None,
@@ -46,6 +49,13 @@ internal static class AssemblyInjection {
         type.Methods.Add(cachedFileName);
         MethodBodyImporter.Import(cachedFileName, TemplateMethod(nameof(ReloadRedirectTemplate),
             nameof(ReloadRedirectTemplate.CachedFileName)));
+
+        var loadedAssemblies = new MethodDefinition("LoadedAssemblies",
+            MethodAttributes.Public | MethodAttributes.Static,
+            module.ImportReference(typeof(Dictionary<string, Assembly>)));
+        type.Methods.Add(loadedAssemblies);
+        MethodBodyImporter.Import(loadedAssemblies, TemplateMethod(nameof(ReloadRedirectTemplate),
+            nameof(ReloadRedirectTemplate.LoadedAssemblies)));
 
         var method = new MethodDefinition("LoadFrom", MethodAttributes.Public | MethodAttributes.Static,
             module.ImportReference(typeof(Assembly)));
@@ -65,12 +75,18 @@ internal static class AssemblyInjection {
         const string templateTypeName = $"{Namespace}.{nameof(ReloadRedirectTemplate)}";
 
         foreach (var instruction in injectedType.Methods.SelectMany(method => method.Body.Instructions)) {
-            if (instruction.Operand is not MethodReference reference) continue;
-            if (reference.DeclaringType.FullName != templateTypeName) continue;
-
-            var injected = injectedType.Methods.FirstOrDefault(candidate => candidate.Name == reference.Name) ??
-                           throw new MissingMethodException(injectedType.FullName, reference.Name);
-            instruction.Operand = injected;
+            switch (instruction.Operand) {
+                case MethodReference method when method.DeclaringType.FullName == templateTypeName:
+                    instruction.Operand = injectedType.Methods.FirstOrDefault(candidate =>
+                                               candidate.Name == method.Name) ??
+                                           throw new MissingMethodException(injectedType.FullName, method.Name);
+                    break;
+                case FieldReference field when field.DeclaringType.FullName == templateTypeName:
+                    instruction.Operand = injectedType.Fields.FirstOrDefault(candidate =>
+                                               candidate.Name == field.Name) ??
+                                           throw new MissingFieldException(injectedType.FullName, field.Name);
+                    break;
+            }
         }
     }
 

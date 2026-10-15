@@ -7,18 +7,43 @@ namespace PurePatcher.Runtime;
 internal static class ReloadRedirectTemplate {
     internal const string CacheFolderPlaceholder = "PurePatcher.CacheFolderPlaceholder";
 
+    internal static Dictionary<string, Assembly>? Loaded;
+
     internal static Assembly LoadFrom(string filePath) {
-        var assemblyName = AssemblyName.GetAssemblyName(filePath).Name;
+        var cached = Path.Combine(CacheFolderPlaceholder, CachedFileName(filePath));
+        if (!File.Exists(cached)) {
+            // Untouched mods load exactly like vanilla: the runtime already resolves duplicates by name.
+            if (Loaded is not { Count: > 0 }) return Assembly.LoadFrom(filePath);
+
+            var existingName = AssemblyName.GetAssemblyName(filePath).Name;
+            return existingName != null && Loaded.TryGetValue(existingName, out var existing)
+                ? existing
+                : Assembly.LoadFrom(filePath);
+        }
+
+        var loaded = LoadedAssemblies();
+        var name = AssemblyName.GetAssemblyName(filePath).Name!;
+        if (loaded.TryGetValue(name, out var alreadyLoaded)) return alreadyLoaded;
+
+        var assembly = Assembly.Load(File.ReadAllBytes(cached));
+        loaded[name] = assembly;
+        return assembly;
+    }
+
+    internal static Dictionary<string, Assembly> LoadedAssemblies() {
+        if (Loaded != null) return Loaded;
+
+        var map = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
         foreach (var context in AssemblyLoadContext.All) {
-            foreach (var loaded in context.Assemblies) {
-                if (loaded.GetName().Name == assemblyName) {
-                    return loaded;
+            foreach (var assembly in context.Assemblies) {
+                var name = assembly.GetName().Name;
+                if (name != null && !map.ContainsKey(name)) {
+                    map[name] = assembly;
                 }
             }
         }
 
-        var cached = Path.Combine(CacheFolderPlaceholder, CachedFileName(filePath));
-        return File.Exists(cached) ? Assembly.Load(File.ReadAllBytes(cached)) : Assembly.LoadFrom(filePath);
+        return Loaded = map;
     }
 
     // Two mods can ship DLLs with the same file name, so the cache needs the full path in the name.
