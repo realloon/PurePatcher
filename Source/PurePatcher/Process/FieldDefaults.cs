@@ -40,18 +40,24 @@ internal partial class FieldAdder {
         var initializer = accessor.DeclaringType.FindMethod(initializerMethodName) ??
                           throw new Exception($"Initializer method {initializerMethodName} not found");
 
-        ReplaceRetsInCtors(newField.DeclaringType, () => [
-            Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(initializer.Parameters.Count == 1 ? OpCodes.Ldarg_0 : OpCodes.Nop),
-            Instruction.Create(OpCodes.Call, newField.Module.ImportReference(initializer)),
-            Instruction.Create(OpCodes.Stfld, newField),
-            Instruction.Create(OpCodes.Ret)
-        ]);
+        foreach (var patched in ReplaceRetsInCtors(newField.DeclaringType, () => [
+                     Instruction.Create(OpCodes.Ldarg_0),
+                     Instruction.Create(initializer.Parameters.Count == 1 ? OpCodes.Ldarg_0 : OpCodes.Nop),
+                     Instruction.Create(OpCodes.Call, newField.Module.ImportReference(initializer)),
+                     Instruction.Create(OpCodes.Stfld, newField),
+                     Instruction.Create(OpCodes.Ret)
+                 ])) {
+            AccessWidening.WidenSameModuleReferences(patched);
+        }
     }
 
-    private static void ReplaceRetsInCtors(TypeDefinition typeDef, Func<IEnumerable<Instruction>> replacementGetter) {
+    private static List<MethodDefinition> ReplaceRetsInCtors(TypeDefinition typeDef,
+        Func<IEnumerable<Instruction>> replacementGetter) {
+        var patched = new List<MethodDefinition>();
+
         foreach (var ctor in typeDef.GetConstructors().Where(c => !c.IsStatic)) {
             if (CallsAThisCtor(ctor)) continue;
+
 
             var replacementList = replacementGetter().ToList();
             var firstReplacement = replacementList[0];
@@ -69,7 +75,11 @@ internal partial class FieldAdder {
 
                 insts.InsertRange(i + 1, replacementList);
             }
+
+            patched.Add(ctor);
         }
+
+        return patched;
     }
 
     private static CustomAttribute? GetExplicitDefaultValue(MethodDefinition accessor) => accessor
