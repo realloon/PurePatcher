@@ -1,40 +1,40 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>14</LangVersion>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <RootNamespace>Tests</RootNamespace>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
+    <!-- 0Harmony ships its own IgnoresAccessChecksToAttribute, which Publicizer also injects. -->
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
+    <!-- These tests compile but cannot run outside the game: stock .NET enforces the access checks WaylithClr skips. -->
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  <PropertyGroup>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <DebugType>none</DebugType>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Krafs.Publicizer" Version="2.3.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.3.0" />
-    <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
-    <PackageReference Include="coverlet.collector" Version="3.1.2" />
-    <PackageReference Include="Lib.Harmony" Version="2.4.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="NUnit" Version="4.2.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.3.0" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <!-- Copied: the test host needs 0Harmony for Mono.Cecil and MonoMod.Utils. -->
+    <PackageReference Include="Lib.Harmony" Version="3.0.0-rc.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PurePatcher\PurePatcher.csproj" />
     <ProjectReference Include="..\TestAssembly\TestAssembly.csproj" />
     <ProjectReference Include="..\TestAssemblyTarget\TestAssemblyTarget.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 0Harmony's Mono.Cecil and MonoMod.Utils types are internal. -->
+    <PackageReference Include="Krafs.Publicizer" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>

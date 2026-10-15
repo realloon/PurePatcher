@@ -42,7 +42,7 @@ internal partial class FieldAdder {
 
         ReplaceRetsInCtors(newField.DeclaringType, () => [
             Instruction.Create(OpCodes.Ldarg_0),
-            Instruction.Create(initializer.Parameters.Count() == 1 ? OpCodes.Ldarg_0 : OpCodes.Nop),
+            Instruction.Create(initializer.Parameters.Count == 1 ? OpCodes.Ldarg_0 : OpCodes.Nop),
             Instruction.Create(OpCodes.Call, newField.Module.ImportReference(initializer)),
             Instruction.Create(OpCodes.Stfld, newField),
             Instruction.Create(OpCodes.Ret)
@@ -59,7 +59,7 @@ internal partial class FieldAdder {
 
             var insts = ctor.Body.Instructions;
 
-            for (var i = insts.Count() - 1; i >= 0; i--) {
+            for (var i = insts.Count - 1; i >= 0; i--) {
                 var inst = insts.ElementAt(i);
                 if (inst.OpCode != OpCodes.Ret) continue;
 

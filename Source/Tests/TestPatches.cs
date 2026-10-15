@@ -19,7 +19,11 @@ internal class TestPatches : Test {
 
         MethodReplacer.RunReplacements(Set);
         AssemblyRewriter.RunRewrites(Set, "TestAssemblyTarget");
-        Reloader.Reload(Set, LoadAssembly);
+
+        foreach (var assembly in Set.AllAssemblies.Where(candidate => candidate.Modified)) {
+            assembly.SerializeToByteArray();
+            LoadAssembly(assembly);
+        }
     }
 
     [Test]

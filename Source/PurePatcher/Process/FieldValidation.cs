@@ -4,7 +4,7 @@ namespace PurePatcher.Process;
 
 internal partial class FieldAdder {
     private string? CheckFieldAccessor(MethodDefinition accessor) {
-        if (accessor.Parameters.Count() != 1) {
+        if (accessor.Parameters.Count != 1) {
             return "Accessor must have exactly one parameter";
         }
 

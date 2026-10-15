@@ -125,7 +125,7 @@ internal partial class FieldAdder(AssemblySet set) {
 
     internal static IEnumerable<MethodDefinition>
         GetAllAddFieldAccessors(IEnumerable<TypeDefinition> inTypes) => inTypes
-        .Where(t => t.IsSealed && t.IsAbstract)
+        .Where(t => t is { IsSealed: true, IsAbstract: true })
         .SelectMany(t => t.Methods, (t, m) => new { t, m })
         .Where(t1 => t1.m.HasCustomAttribute(typeof(AddFieldAttribute).FullName!))
         .Select(t1 => t1.m);

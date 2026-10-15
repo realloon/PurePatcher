@@ -14,12 +14,10 @@ public class AssemblySet {
         Resolver = new AssemblyResolver(this);
     }
 
-    public ModifiableAssembly AddAssembly(string friendlyName, string? asmFilePath, Assembly? asm) {
+    public ModifiableAssembly AddAssembly(string friendlyName, string asmFilePath, Assembly? asm) {
         Logger.Verbose($"Adding assembly {friendlyName}");
 
-        var masm = asmFilePath != null
-            ? new ModifiableAssembly(friendlyName, asmFilePath, Resolver)
-            : new ModifiableAssembly(friendlyName, asm!, Resolver);
+        var masm = new ModifiableAssembly(friendlyName, asmFilePath, Resolver) { SourceAssembly = asm };
 
         _nameToAsm[masm.AsmDefinition.ShortName()] = masm;
         AllAssemblies.Add(masm);
@@ -41,26 +39,6 @@ public class AssemblySet {
     internal TypeDefinition ReflectionToCecil(Type type) {
         // Use any assembly as they all go through the same assembly resolver
         return AllAssemblies[0].ModuleDefinition.ImportReference(type).Resolve();
-    }
-
-    internal Dictionary<ModifiableAssembly, HashSet<ModifiableAssembly>> AllAssembliesToDependants() {
-        var dependants = new Dictionary<ModifiableAssembly, HashSet<ModifiableAssembly>>();
-
-        foreach (var asm in _nameToAsm.Values) {
-            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-            foreach (var reference in asm.ModuleDefinition.AssemblyReferences) {
-                var refAsm = FindAssembly(reference.Name);
-                if (refAsm == null) continue;
-
-                if (!dependants.TryGetValue(refAsm, out var set)) {
-                    dependants[refAsm] = set = [];
-                }
-
-                set.Add(asm);
-            }
-        }
-
-        return dependants;
     }
 
     private class AssemblyResolver(AssemblySet processor) : IAssemblyResolver {

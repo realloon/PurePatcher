@@ -7,9 +7,7 @@ using ICustomAttributeProvider = System.Reflection.ICustomAttributeProvider;
 namespace PurePatcher.Process;
 
 internal static class AssemblyRewriter {
-    internal static void RunRewrites(AssemblySet assemblySet, string mainAssemblyName,
-        Action<ModifiableAssembly>? callback = null,
-        Type? skippedRewriterType = null) { // [Prepatcher] compatibility
+    internal static void RunRewrites(AssemblySet assemblySet, string mainAssemblyName) {
         Logger.Verbose("Running assembly rewrites");
 
         var rewriterAssemblies = assemblySet.AllAssemblies
@@ -22,12 +20,6 @@ internal static class AssemblyRewriter {
 
         foreach (var modifiableAssembly in rewriterAssemblies)
         foreach (var rewriter in FindAllAssemblyRewrites(modifiableAssembly.SourceAssembly!)) {
-            if (rewriter.DeclaringType == skippedRewriterType) {
-                Logger.Info("Skipping builtin assembly rewrite.");
-                continue;
-            }
-
-            callback?.Invoke(modifiableAssembly);
             Logger.Verbose($"Running assembly rewrite: {rewriter.FullDescription()}");
 
             if (InvokeRewriter(rewriter, mainAssembly.ModuleDefinition)) {

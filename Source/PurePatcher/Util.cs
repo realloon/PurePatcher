@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -6,18 +5,6 @@ namespace PurePatcher;
 
 internal static class Util {
     public static string ShortName(this AssemblyDefinition asm) => asm.Name.Name;
-
-    public static string ManagedFolderOS() {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
-            return "Resources/Data/Managed";
-        }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
-            return "Managed";
-        }
-
-        throw new Exception("Unknown platform");
-    }
 
     public static IEnumerable<TypeDefinition> BaseTypesAndSelfResolved(this TypeDefinition? type) {
         while (type != null) {

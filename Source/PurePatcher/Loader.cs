@@ -1,120 +1,42 @@
-using System.Reflection;
-using UnityEngine;
-using HarmonyLib;
-using Verse;
-using Verse.Steam;
 using PurePatcher.Process;
-
-// ReSharper disable ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+using PurePatcher.Runtime;
+using Verse;
 
 namespace PurePatcher;
 
 internal static class Loader {
-    internal static Assembly OrigAsm = null!;
-    internal static Assembly NewAsm = null!;
-    internal static volatile bool RestartGame;
+    internal static void Reload(string packageId) {
+        var state = new PatchState();
+        state.SyncVanillaBaseline();
 
-    internal static void Reload() {
+        var fingerprint = PatchFingerprint.Compute(state);
+
+        if (AssemblyInjection.TryReadFingerprint(typeof(Game).Assembly) == fingerprint) {
+            Logger.Verbose($"Assembly-CSharp is patched for {fingerprint}");
+            state.ClearAttempts(fingerprint);
+            return;
+        }
+
+        if (state.IsBlocked(fingerprint)) {
+            Logger.Error($"PurePatcher gave up after repeated boot failures ({fingerprint}). " +
+                         "Verify the game files in Steam to retry.");
+            return;
+        }
+
         try {
-            Logger.Verbose("Reloading the game");
-            DoReload();
+            state.CleanupOtherOutputs(fingerprint);
 
-            if (GenCommandLine.CommandLineArgPassed("patchandexit")) {
-                Application.Quit();
+            var set = AssemblyCollector.Collect(state);
+            using (StopwatchScope.Measure("Game processing")) {
+                GameProcessing.Process(set, state, fingerprint, packageId);
             }
 
-            Logger.Info("Done loading");
-            RestartGame = true;
+            PatchInstaller.Write(set, state, fingerprint);
+
+            Logger.Info($"Patched Assembly-CSharp ({fingerprint}); restarting the game.");
+            GameRestart.Restart();
         } catch (Exception e) {
-            Logger.Error($"Fatal error while reloading: {e}");
-            throw;
+            Logger.Error($"Failed to patch the game, continuing unpatched: {e}");
         }
-    }
-
-    private static void DoReload() {
-        OrigAsm = typeof(Game).Assembly;
-
-        var set = new AssemblySet();
-        set.AddAssembly(AssemblyCollector.AssemblyCSharp, null, typeof(Game).Assembly);
-
-        foreach (var (friendlyName, path) in AssemblyCollector.SystemAssemblyPaths()) {
-            if (AssemblyName.GetAssemblyName(path).Name == AssemblyCollector.AssemblyCSharp) continue;
-
-            var addedAsm = set.AddAssembly(friendlyName, path, null);
-            addedAsm.AllowPatches = false;
-        }
-
-        foreach (var (friendlyName, asm) in AssemblyCollector.ModAssemblies()) {
-            var name = asm.GetName().Name;
-
-            // Don't add system assemblies packaged by mods
-            if (set.HasAssembly(name)) continue;
-
-            var addedAsm = set.AddAssembly(friendlyName, null, asm);
-
-            addedAsm.ProcessAttributes = true;
-        }
-
-        using (StopwatchScope.Measure("Game processing")) GameProcessing.Process(set);
-
-        // Reload the assemblies
-        Reloader.Reload(
-            set,
-            LoadAssembly,
-            beforeRefOnlys: () => {
-                Patches.HarmonyPatches.PatchRootMethods();
-                Application.logMessageReceivedThreaded -= Log.Notify_MessageReceivedThreadedInternal;
-                UnregisterWorkshopCallbacks();
-                ClearAssemblyResolve();
-            }
-        );
-    }
-
-    private static void LoadAssembly(ModifiableAssembly asm) {
-        Logger.Verbose($"Loading assembly: {asm}");
-
-        var loadedAssembly = Assembly.Load(asm.Bytes);
-        if (loadedAssembly.GetName().Name == AssemblyCollector.AssemblyCSharp) {
-            NewAsm = loadedAssembly;
-            AppDomain.CurrentDomain.AssemblyResolve += (_, _) => loadedAssembly;
-        }
-
-        if (!GenCommandLine.TryGetCommandLineArg("dumpasms", out var path) || path.Trim().NullOrEmpty()) return;
-
-        Directory.CreateDirectory(path);
-
-        if (asm.Modified) {
-            File.WriteAllBytes(Path.Combine(path, asm.AsmDefinition.Name.Name + ".dll"), asm.Bytes!);
-        }
-    }
-
-    private static void UnregisterWorkshopCallbacks() {
-        Logger.Verbose("Unregistering workshop callbacks");
-
-        // These hold references to old code and would get called externally by Steam
-        Workshop.subscribedCallback?.Unregister();
-        Workshop.unsubscribedCallback?.Unregister();
-        Workshop.installedCallback?.Unregister();
-    }
-
-    private static void ClearAssemblyResolve() {
-        Logger.Verbose("Clearing AppDomain.AssemblyResolve");
-
-        var asmResolve = AccessTools.Field(typeof(AppDomain), "AssemblyResolve");
-        var del = (Delegate)asmResolve.GetValue(AppDomain.CurrentDomain);
-
-        // Handle MonoMod's internal dynamic assemblies
-        foreach (var d in del.GetInvocationList().ToList()) {
-            if (!d!.Method.DeclaringType!.Namespace!.StartsWith("MonoMod.Utils")) continue;
-
-            foreach (var f in AccessTools.GetDeclaredFields(d.Method.DeclaringType)) {
-                if (f.FieldType != typeof(Assembly)) continue;
-
-                var da = (Assembly)f.GetValue(d.Target);
-                Reloader.SetRefonly.Add(da);
-            }
-        }
-
-        asmResolve.SetValue(AppDomain.CurrentDomain, null);
     }
 }

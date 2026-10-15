@@ -21,7 +21,7 @@ public class BaseWithComps : InjectionBase {
         comps.Clear();
 
         foreach (var type in CompTypes) {
-            var comp = (BaseComp)Activator.CreateInstance(type);
+            var comp = (BaseComp)Activator.CreateInstance(type)!;
             comp.parent = this;
             comps.Add(comp);
         }
@@ -40,7 +40,7 @@ public class NullableWithComps {
         comps = [];
 
         foreach (var type in CompTypes) {
-            var comp = (BaseComp)Activator.CreateInstance(type);
+            var comp = (BaseComp)Activator.CreateInstance(type)!;
             comps.Add(comp);
         }
     }

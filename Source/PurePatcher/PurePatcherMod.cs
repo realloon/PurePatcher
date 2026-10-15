@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using UnityEngine;
 using Verse;
 
 namespace PurePatcher;
@@ -10,27 +9,7 @@ internal class PurePatcherMod : Mod {
 
     public PurePatcherMod(ModContentPack content) : base(content) {
         InitLogger();
-
-        if (BootstrapState.StartedOnce) {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += (_, args) => {
-                Logger.Verbose($"ReflectionOnlyAssemblyResolve: {args.RequestingAssembly} requested {args.Name}");
-                return null;
-            };
-
-            Logger.Info($"Restarted with the patched assembly, going silent.");
-            return;
-        }
-
-        BootstrapState.MarkStartedOnce();
-        Logger.Info($"Starting... (vanilla load took {Time.realtimeSinceStartup}s)");
-
-        Patches.HarmonyPatches.SilenceLogging();
-        Loader.Reload();
-
-        // Thread abortion counts as a crash
-        Prefs.data.resetModsConfigOnCrash = false;
-
-        Thread.CurrentThread.Abort();
+        Loader.Reload(content.PackageId);
     }
 
     private static void InitLogger() {

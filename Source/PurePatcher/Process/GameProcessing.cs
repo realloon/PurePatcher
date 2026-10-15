@@ -1,16 +1,11 @@
+using PurePatcher.Runtime;
+using Verse;
+
 namespace PurePatcher.Process;
 
 internal static class GameProcessing {
-    internal static void Process(AssemblySet set) {
+    internal static void Process(AssemblySet set, PatchState state, string fingerprint, string packageId) {
         var asmCSharp = set.FindAssembly(AssemblyCollector.AssemblyCSharp)!;
-        var prepatcherActive = PrepatcherCompatibility.IsActive(); // [Prepatcher] compatibility
-
-        // Other code assumes that these always get reloaded
-        asmCSharp.SetNeedsReload();
-        set.FindAssembly("0Harmony")!.SetNeedsReload();
-
-        var monoModUtils = set.FindAssembly("MonoMod.Utils");
-        monoModUtils?.SetNeedsReload();
 
         // Field addition
         var fieldAdder = new FieldAdder(set);
@@ -20,16 +15,15 @@ internal static class GameProcessing {
         // Method replacement
         MethodReplacer.RunReplacements(set, AssemblyCollector.ActivePackageIds());
 
-        if (prepatcherActive) {
-            Logger.Info("Prepatcher is active; skipping duplicate startup support patches.");
-        } else {
-            // Fix the update order of RimWorld's reloaded Unity components
-            ExecutionOrderFixer.ApplyExecutionOrderAttributes(asmCSharp.ModuleDefinition);
-            asmCSharp.Modified = true; // Mark as modified so it's serialized and new attributes are applied
-        }
+        // Support code the patched Assembly-CSharp needs
+        AssemblyInjection.InjectRedirect(asmCSharp.ModuleDefinition, state.CacheFolder(fingerprint));
+        AssemblyInjection.InjectMarker(asmCSharp.ModuleDefinition, fingerprint);
+        AssemblyInjection.InjectBootGuard(asmCSharp.ModuleDefinition, state.Folder, fingerprint,
+            GenFilePaths.ModsConfigFilePath, packageId);
 
         // Assembly rewriting
-        AssemblyRewriter.RunRewrites(set, AssemblyCollector.AssemblyCSharp,
-            skippedRewriterType: prepatcherActive ? PrepatcherCompatibility.BuiltinRewriteTypeToSkip : null);
+        AssemblyRewriter.RunRewrites(set, AssemblyCollector.AssemblyCSharp);
+
+        asmCSharp.Modified = true;
     }
 }

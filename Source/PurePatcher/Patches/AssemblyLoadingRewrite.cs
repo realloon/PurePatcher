@@ -1,42 +1,26 @@
 using System.Reflection;
 using Mono.Cecil;
 using MonoMod.Utils;
-using Verse;
 using PurePatcher.Annotations;
+using PurePatcher.Runtime;
 
 namespace PurePatcher.Patches;
 
 public static class AssemblyLoadingRewrite {
     [RewriteAssembly]
     public static void ReplaceAssemblyLoading(ModuleDefinition module) {
-        var type = module.GetType($"{nameof(Verse)}.{nameof(ModAssemblyHandler)}");
-        var method = type.FindMethod(nameof(ModAssemblyHandler.ReloadAll)) ??
-                     throw new MissingMethodException(type.FullName, nameof(ModAssemblyHandler.ReloadAll));
+        var type = module.GetType($"{nameof(Verse)}.{nameof(Verse.ModAssemblyHandler)}");
+        var method = type.FindMethod(nameof(Verse.ModAssemblyHandler.ReloadAll)) ??
+                     throw new MissingMethodException(type.FullName, nameof(Verse.ModAssemblyHandler.ReloadAll));
+
+        var redirect = module.GetType($"{AssemblyInjection.Namespace}.{AssemblyInjection.ReloadRedirectType}")
+                           ?.Methods.FirstOrDefault(candidate => candidate.Name == "LoadFrom") ??
+                       throw new MissingMethodException(AssemblyInjection.ReloadRedirectType, "LoadFrom");
 
         foreach (var inst in method.Body.Instructions) {
             if (inst.Operand is MethodReference { Name: nameof(Assembly.LoadFrom) }) {
-                inst.Operand = module.ImportReference(typeof(AssemblyLoadingRewrite).GetMethod(nameof(LoadFrom)));
+                inst.Operand = redirect;
             }
         }
-    }
-
-    public static Assembly LoadFrom(string filePath) {
-        var asmName = AssemblyName.GetAssemblyName(filePath);
-        var asmWithName = AppDomain.CurrentDomain.GetAssemblies()
-            .FirstOrDefault(a => a.GetName().Name == asmName.Name);
-
-        if (asmWithName != null) {
-            return asmWithName;
-        }
-
-        var rawAssembly = File.ReadAllBytes(filePath);
-        var fileInfo = new FileInfo(Path.ChangeExtension(filePath, ".pdb"));
-
-        if (!fileInfo.Exists) {
-            return AppDomain.CurrentDomain.Load(rawAssembly);
-        }
-
-        var rawSymbolStore = File.ReadAllBytes(fileInfo.FullName);
-        return AppDomain.CurrentDomain.Load(rawAssembly, rawSymbolStore);
     }
 }
