@@ -6,10 +6,7 @@ Assemblies/
 !1.6/Assemblies
 
 # Source
+**/.idea/
 **/bin/
 **/obj/
 **.user
-
-# Rider
-**/.idea/workspace.xml
-**/.idea/projectSettingsUpdater.xml

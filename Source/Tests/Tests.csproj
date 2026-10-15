@@ -21,7 +21,6 @@
     <PackageReference Include="NUnit" Version="4.2.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="NUnit.Analyzers" Version="4.3.0" />
-    <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <!-- Copied: the test host needs 0Harmony for Mono.Cecil and MonoMod.Utils. -->
     <PackageReference Include="Lib.Harmony" Version="3.0.0-rc.2" />
   </ItemGroup>

@@ -18,11 +18,6 @@
     <GenerateDependencyFile>false</GenerateDependencyFile>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <DebugSymbols>false</DebugSymbols>
-    <DebugType>none</DebugType>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Krafs.Publicizer" Version="2.3.0" />
     <!-- Not copied: the Harmony mod ships 0Harmony, which embeds Mono.Cecil and MonoMod.Utils. -->
