@@ -7,7 +7,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>PurePatcher</RootNamespace>
     <AssemblyName>PurePatcher</AssemblyName>
-    <PublicizerRuntimeStrategies>Unsafe</PublicizerRuntimeStrategies>
+    <PublicizerRuntimeStrategies>Unsafe;IgnoresAccessChecksTo</PublicizerRuntimeStrategies>
+    <!-- 0Harmony ships its own IgnoresAccessChecksToAttribute, which Publicizer also injects. -->
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
