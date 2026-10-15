@@ -106,6 +106,7 @@ internal static class MethodReplacer {
     private static void ReplaceMethodBody(MethodDefinition target, MethodDefinition replacement) {
         Logger.Verbose($"Replacing method body: {target.MemberFullName()}");
         MethodBodyImporter.Import(target, replacement);
+        AccessWidening.WidenSameModuleReferences(target);
     }
 
     private static void ValidateReplacementMethod(MethodDefinition replacement) {
