@@ -8,7 +8,6 @@
     <RootNamespace>Tests</RootNamespace>
     <!-- 0Harmony ships its own IgnoresAccessChecksToAttribute, which Publicizer also injects. -->
     <NoWarn>$(NoWarn);CS0436</NoWarn>
-    <!-- These tests compile but cannot run outside the game: stock .NET enforces the access checks WaylithClr skips. -->
   </PropertyGroup>
 
   <PropertyGroup>

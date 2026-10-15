@@ -2,6 +2,7 @@ using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using PurePatcher.Process;
+using PurePatcher.Runtime;
 using TestAssemblyTarget;
 
 namespace Tests;
@@ -14,11 +15,16 @@ internal class TestPatches : Test {
         FieldAdder.ProcessTypes([
             TestAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(NewFields)}"),
             TestAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(DefaultValues)}"),
-            TestAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(Injections)}")
+            TestAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(Injections)}"),
+            TestAsm.ModuleDefinition.GetType($"{nameof(Tests)}.{nameof(SameModuleAccess)}")
         ]);
 
         MethodReplacer.RunReplacements(Set);
         AssemblyRewriter.RunRewrites(Set, "TestAssemblyTarget");
+
+        foreach (var assembly in Set.AllAssemblies.Where(candidate => candidate.Modified)) {
+            AssemblyInjection.InjectAccessCheckExemptions(assembly.ModuleDefinition);
+        }
 
         foreach (var assembly in Set.AllAssemblies.Where(candidate => candidate.Modified)) {
             assembly.SerializeToByteArray();
@@ -29,24 +35,39 @@ internal class TestPatches : Test {
     [Test]
     public void TestNewFields() {
         Assert.Multiple(() => {
-            Assert.That(NewFields.TestIntField(1), Is.EqualTo(1));
-            Assert.That(NewFields.TestIntStructField(1), Is.EqualTo(1));
+            Assert.That(InvokePatched<int>(PatchType(nameof(NewFields)), nameof(NewFields.TestIntField), 1),
+                Is.EqualTo(1));
+            Assert.That(InvokePatched<int>(PatchType(nameof(NewFields)), nameof(NewFields.TestIntStructField), 1),
+                Is.EqualTo(1));
         });
     }
 
     [Test]
     public void TestInjections() {
         Assert.Multiple(() => {
-            Assert.That(Injections.TestOtherCompInjection(), Is.True);
-            Assert.That(Injections.TestCompInjection(), Is.True);
-            Assert.That(Injections.TestCompInjection_DoubleInit(), Is.True);
-            Assert.That(Injections.TestCompInjection_ClearedOnReinit(), Is.True);
-            Assert.That(Injections.TestCompBaseInjection(), Is.True);
-            Assert.That(Injections.TestCompInjectionOnSubType(), Is.True);
-            Assert.That(Injections.TestCompBaseInjectionOnSubType(), Is.True);
-            Assert.That(Injections.TestCompInjectionOnSuperType(), Is.True);
-            Assert.That(Injections.TestNullCompsInjection(), Is.True);
-            Assert.That(Injections.TestNullableCompsInjection(), Is.True);
+            Assert.That(InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestOtherCompInjection)),
+                Is.True);
+            Assert.That(InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestCompInjection)),
+                Is.True);
+            Assert.That(InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestCompInjection_DoubleInit)),
+                Is.True);
+            Assert.That(
+                InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestCompInjection_ClearedOnReinit)),
+                Is.True);
+            Assert.That(InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestCompBaseInjection)),
+                Is.True);
+            Assert.That(InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestCompInjectionOnSubType)),
+                Is.True);
+            Assert.That(
+                InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestCompBaseInjectionOnSubType)),
+                Is.True);
+            Assert.That(
+                InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestCompInjectionOnSuperType)),
+                Is.True);
+            Assert.That(InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestNullCompsInjection)),
+                Is.True);
+            Assert.That(InvokePatched<bool>(PatchType(nameof(Injections)), nameof(Injections.TestNullableCompsInjection)),
+                Is.True);
         });
     }
 
@@ -66,7 +87,7 @@ internal class TestPatches : Test {
 
     [Test]
     public void TestDefaultValues() {
-        var values = DefaultValues.TestDefaultValues();
+        var values = InvokePatched<object?[]>(PatchType(nameof(DefaultValues)), nameof(DefaultValues.TestDefaultValues));
 
         Assert.Multiple(() => {
             Assert.That(values[0], Is.EqualTo(false));
@@ -103,10 +124,11 @@ internal class TestPatches : Test {
 
     [Test]
     public void TestDefaultInitValues() {
-        var values = DefaultValues.TestDefaultInitValues();
+        var values = InvokePatched<object?[]>(PatchType(nameof(DefaultValues)),
+            nameof(DefaultValues.TestDefaultInitValues));
 
         Assert.Multiple(() => {
-            Assert.That(values[0], Is.EqualTo(DefaultValues.IntParameterlessInitializer()));
+            Assert.That(values[0], Is.EqualTo(1));
 
             Assert.That(values[1], Is.EqualTo(1));
             Assert.That(values[2], Is.EqualTo(true));
@@ -123,18 +145,61 @@ internal class TestPatches : Test {
 
     [Test]
     public void TestAssemblyRewriting() {
-        Assert.That(AssemblyRewriting.TestRewriteTargetMethod(), Is.EqualTo(1));
+        Assert.That(InvokePatched<int>(PatchType(nameof(AssemblyRewriting)),
+            nameof(AssemblyRewriting.TestRewriteTargetMethod)), Is.EqualTo(1));
     }
 
     [Test]
     public void TestMethodReplacement() {
+        var type = PatchType(nameof(MethodReplacement));
         Assert.Multiple(() => {
-            Assert.That(MethodReplacement.TestInstanceMethod(), Is.EqualTo(12));
-            Assert.That(MethodReplacement.TestStaticMethod(), Is.EqualTo("ab"));
-            Assert.That(MethodReplacement.TestBranchMethod(5), Is.EqualTo(12));
-            Assert.That(MethodReplacement.TestBranchMethod(1), Is.EqualTo(-8));
+            Assert.That(InvokePatched<int>(type, nameof(MethodReplacement.TestInstanceMethod)), Is.EqualTo(12));
+            Assert.That(InvokePatched<string>(type, nameof(MethodReplacement.TestStaticMethod)), Is.EqualTo("ab"));
+            Assert.That(InvokePatched<int>(type, nameof(MethodReplacement.TestBranchMethod), 5), Is.EqualTo(12));
+            Assert.That(InvokePatched<int>(type, nameof(MethodReplacement.TestBranchMethod), 1), Is.EqualTo(-8));
         });
     }
+
+    [Test]
+    public void TestSameModuleInitializerIsWidenedAndCallable() {
+        var initializer = TestAsm.ModuleDefinition.GetType(PatchType(nameof(SameModuleAccess)))
+            .Methods.Single(method => method.Name == "PrivateInitializer");
+
+        Assert.Multiple(() => {
+            Assert.That(initializer.IsAssembly, Is.True);
+            Assert.That(InvokePatched<int>(PatchType(nameof(SameModuleAccess)), nameof(SameModuleAccess.Read)),
+                Is.EqualTo(41));
+        });
+    }
+
+    [Test]
+    public void TestAccessCheckExemptionsCoverReferences() {
+        foreach (var assembly in Set.AllAssemblies.Where(candidate => candidate.Modified)) {
+            var module = assembly.ModuleDefinition;
+            var exempt = module.Assembly.CustomAttributes
+                .Where(attribute => attribute.AttributeType.FullName == AssemblyInjection.AttributeTypeName)
+                .Select(attribute => (string)attribute.ConstructorArguments[0].Value)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            Assert.Multiple(() => {
+                Assert.That(module.Types.Count(type => type.Name == "IgnoresAccessChecksToAttribute"), Is.EqualTo(1));
+                Assert.That(module.AssemblyReferences.Select(reference => reference.Name), Is.SubsetOf(exempt));
+            });
+        }
+    }
+
+    [Test]
+    public void TestUnresolvableReferencesAreSkipped() {
+        var method = TestAsm.ModuleDefinition.GetType(PatchType(nameof(SameModuleAccess)))
+            .Methods.Single(candidate => candidate.Name == nameof(SameModuleAccess.Read));
+        var bogus = new TypeReference("Bogus", "Missing", TestAsm.ModuleDefinition,
+            new AssemblyNameReference("Bogus", new Version(1, 0)));
+        method.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Isinst, bogus));
+
+        Assert.DoesNotThrow(() => AccessWidening.WidenSameModuleReferences(method));
+    }
+
+    private static string PatchType(string name) => $"{nameof(Tests)}.{name}";
 
     [Test]
     public void TestMethodReplacementIsInlined() {

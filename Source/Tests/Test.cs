@@ -1,7 +1,9 @@
 global using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using Mono.Cecil;
 using PurePatcher;
 using PurePatcher.Process;
@@ -14,6 +16,10 @@ internal class Test {
     protected FieldAdder FieldAdder = null!;
     protected ModifiableAssembly TestAsm = null!;
     protected ModifiableAssembly TargetAsm = null!;
+
+    private readonly Dictionary<string, byte[]> _patchedBytes = new(StringComparer.OrdinalIgnoreCase);
+    private AssemblyLoadContext? _patchedContext;
+    private Assembly? _patchedTestAssembly;
 
     public virtual void Setup() {
         Logger.InfoFunc = Console.WriteLine;
@@ -102,9 +108,35 @@ internal class Test {
         return (liveTestAsm, liveTargetAsm);
     }
 
-    protected static void LoadAssembly(ModifiableAssembly asm) {
-        Assembly.Load(asm.Bytes!);
+    // The rewrite lands in files the game loads on its next start, so the patched assemblies have to be
+    // loaded into a context of their own: the already loaded originals keep their empty accessor bodies.
+    protected void LoadAssembly(ModifiableAssembly asm) {
+        _patchedBytes[asm.AsmDefinition.Name.Name] = asm.Bytes!;
     }
+
+    protected Assembly PatchedTestAssembly {
+        get {
+            if (_patchedTestAssembly != null) return _patchedTestAssembly;
+
+            _patchedContext = new AssemblyLoadContext("patched", isCollectible: true);
+            _patchedContext.Resolving += (context, name) =>
+                _patchedBytes.TryGetValue(name.Name!, out var bytes)
+                    ? context.LoadFromStream(new MemoryStream(bytes))
+                    : null;
+
+            // Load the target first: otherwise resolution falls back to the already loaded original.
+            foreach (var patched in _patchedBytes.Where(entry => entry.Key != "TestAssembly")) {
+                _patchedContext.LoadFromStream(new MemoryStream(patched.Value));
+            }
+
+            return _patchedTestAssembly = _patchedContext.LoadFromStream(new MemoryStream(_patchedBytes["TestAssembly"]));
+        }
+    }
+
+    protected T InvokePatched<T>(string typeName, string methodName, params object?[] arguments) =>
+        (T)PatchedTestAssembly.GetType(typeName, throwOnError: true)!
+            .GetMethod(methodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!
+            .Invoke(null, arguments)!;
 
     private static string AssemblyPath(string fileName) => Path.Combine(AppContext.BaseDirectory, fileName);
 }
