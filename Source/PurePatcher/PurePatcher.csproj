@@ -27,7 +27,7 @@
     <PackageReference Include="Krafs.Publicizer" Version="2.3.0" />
     <!-- Not copied: the Harmony mod ships 0Harmony, which embeds Mono.Cecil and MonoMod.Utils. -->
     <PackageReference Include="Lib.Harmony" Version="3.0.0-rc.2" ExcludeAssets="runtime" />
-    <PackageReference Include="Vortex.Rimworld.Ref" Version="1.7.4977" />
+    <PackageReference Include="Vortex.Rimworld.Ref" Version="1.7.4979" />
   </ItemGroup>
 
   <ItemGroup>
