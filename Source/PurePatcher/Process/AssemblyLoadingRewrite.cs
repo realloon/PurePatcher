@@ -4,7 +4,7 @@ using MonoMod.Utils;
 using PurePatcher.Annotations;
 using PurePatcher.Runtime;
 
-namespace PurePatcher.Patches;
+namespace PurePatcher.Process;
 
 public static class AssemblyLoadingRewrite {
     [RewriteAssembly]
