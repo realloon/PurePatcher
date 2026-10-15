@@ -122,7 +122,7 @@ internal static class AssemblyInjection {
 
     // Rewritten bodies run inside Assembly-CSharp, so anything they call in a mod assembly has to be
     // reachable from there even when the mod declared it private.
-    internal static void InjectAccessCheckExemptions(ModuleDefinition module, IEnumerable<string> assemblyNames) {
+    internal static void InjectAccessCheckExemptions(ModuleDefinition module) {
         var attributeType = new TypeDefinition("System.Runtime.CompilerServices",
             "IgnoresAccessChecksToAttribute",
             TypeAttributes.NotPublic | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,
@@ -171,9 +171,10 @@ internal static class AssemblyInjection {
         property.GetMethod = getter;
         attributeType.Properties.Add(property);
 
-        foreach (var assemblyName in assemblyNames.Distinct()) {
+        // Everything the patched assembly can reference, including the game's own framework assemblies.
+        foreach (var reference in module.AssemblyReferences) {
             module.Assembly.CustomAttributes.Add(new CustomAttribute(ctor) {
-                ConstructorArguments = { new CustomAttributeArgument(module.TypeSystem.String, assemblyName) }
+                ConstructorArguments = { new CustomAttributeArgument(module.TypeSystem.String, reference.Name) }
             });
         }
     }

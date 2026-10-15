@@ -20,12 +20,11 @@ internal static class GameProcessing {
         AssemblyInjection.InjectMarker(asmCSharp.ModuleDefinition, fingerprint);
         AssemblyInjection.InjectBootGuard(asmCSharp.ModuleDefinition, state.Folder, fingerprint,
             GenFilePaths.ModsConfigFilePath, packageId);
-        AssemblyInjection.InjectAccessCheckExemptions(asmCSharp.ModuleDefinition,
-            set.AllAssemblies.Where(assembly => assembly.SourceAssembly != null)
-                .Select(assembly => assembly.AsmDefinition.Name.Name));
-
         // Assembly rewriting
         AssemblyRewriter.RunRewrites(set, AssemblyCollector.AssemblyCSharp);
+
+        // Last, once every rewrite has landed: exemptions for each referenced assembly.
+        AssemblyInjection.InjectAccessCheckExemptions(asmCSharp.ModuleDefinition);
 
         asmCSharp.Modified = true;
     }
