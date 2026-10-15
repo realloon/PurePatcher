@@ -58,6 +58,8 @@ internal partial class FieldAdder {
         foreach (var ctor in typeDef.GetConstructors().Where(c => !c.IsStatic)) {
             if (CallsAThisCtor(ctor)) continue;
 
+            // Injecting grows the body, which can push existing short branches out of range.
+            ctor.Body.SimplifyMacros();
 
             var replacementList = replacementGetter().ToList();
             var firstReplacement = replacementList[0];

@@ -2,6 +2,7 @@ using System.Collections;
 using HarmonyLib;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 using MonoMod.Utils;
 using PurePatcher.Annotations;
 
@@ -53,6 +54,10 @@ internal partial class FieldAdder {
 
         var body = initMethod.Body;
         var module = initMethod.Module;
+
+        // Injecting grows the body, which can push existing short branches out of range.
+        body.SimplifyMacros();
+
         var il = body.GetILProcessor();
 
         // Cache each applicable target cast once so all bindings at this site can share one list scan.
