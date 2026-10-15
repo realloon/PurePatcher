@@ -23,19 +23,33 @@ internal static class AccessWidening {
         foreach (var instruction in method.Body.Instructions) {
             switch (instruction.Operand) {
                 case MethodReference reference:
-                    Widen(reference.Resolve(), module);
+                    WidenResolved(() => reference.Resolve(), module);
                     break;
                 case FieldReference reference:
-                    Widen(reference.Resolve(), module);
+                    WidenResolved(() => reference.Resolve(), module);
                     break;
                 case TypeReference reference:
-                    Widen(reference.Resolve(), module);
+                    WidenResolved(() => reference.Resolve(), module);
                     break;
             }
         }
     }
 
-    private static void WidenTypeSignature(TypeReference type, ModuleDefinition module) => Widen(type.Resolve(), module);
+    private static void WidenTypeSignature(TypeReference type, ModuleDefinition module) =>
+        WidenResolved(() => type.Resolve(), module);
+
+    // A reference the resolver cannot map is not a reason to fail the whole patch.
+    private static void WidenResolved(Func<IMetadataTokenProvider?> resolve, ModuleDefinition module) {
+        IMetadataTokenProvider? member;
+        try {
+            member = resolve();
+        } catch (Exception exception) {
+            Logger.Verbose($"Skipping access widening for an unresolvable reference: {exception.Message}");
+            return;
+        }
+
+        Widen(member, module);
+    }
 
     private static void Widen(IMetadataTokenProvider? member, ModuleDefinition module) {
         switch (member) {

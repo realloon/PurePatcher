@@ -23,9 +23,11 @@ internal static class GameProcessing {
         // Assembly rewriting
         AssemblyRewriter.RunRewrites(set, AssemblyCollector.AssemblyCSharp);
 
-        // Last, once every rewrite has landed: exemptions for each referenced assembly.
-        AssemblyInjection.InjectAccessCheckExemptions(asmCSharp.ModuleDefinition);
-
         asmCSharp.Modified = true;
+
+        // Last, once every rewrite has landed: exemptions for each referenced assembly.
+        foreach (var modified in set.AllAssemblies.Where(assembly => assembly.Modified)) {
+            AssemblyInjection.InjectAccessCheckExemptions(modified.ModuleDefinition);
+        }
     }
 }

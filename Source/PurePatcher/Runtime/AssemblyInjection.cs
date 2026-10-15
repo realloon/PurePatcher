@@ -6,7 +6,6 @@ using FieldAttributes = Mono.Cecil.FieldAttributes;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using MethodBody = Mono.Cecil.Cil.MethodBody;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
-using CustomAttributeNamedArgument = Mono.Cecil.CustomAttributeNamedArgument;
 
 namespace PurePatcher.Runtime;
 
@@ -18,6 +17,7 @@ internal static class AssemblyInjection {
     internal const string PatchInfoType = "PatchInfo";
     internal const string BootGuardType = "BootGuard";
     internal const string FingerprintField = "Fingerprint";
+    internal const string AttributeTypeName = "System.Runtime.CompilerServices.IgnoresAccessChecksToAttribute";
 
     private static ModuleDefinition? _templateModule;
 
@@ -120,22 +120,32 @@ internal static class AssemblyInjection {
         CallFromModuleInitializer(module, method);
     }
 
-    // Rewritten bodies run inside Assembly-CSharp, so anything they call in a mod assembly has to be
-    // reachable from there even when the mod declared it private.
+    // Rewritten bodies can end up in any modified assembly, so each of them needs the same exemptions.
     internal static void InjectAccessCheckExemptions(ModuleDefinition module) {
+        var attributeType = module.GetType(AttributeTypeName) ?? InjectAttributeType(module);
+        var ctor = attributeType.Methods.FirstOrDefault(candidate => candidate.IsConstructor &&
+                                                                    candidate.Parameters.Count == 1 &&
+                                                                    candidate.Parameters[0].ParameterType
+                                                                        .FullName == "System.String") ??
+                   throw new MissingMethodException(attributeType.FullName, ".ctor");
+        var exempt = ExemptedAssemblyNames(module, ctor);
+
+        // Everything the patched assembly can reference, including the game's own framework assemblies.
+        foreach (var reference in module.AssemblyReferences) {
+            if (!exempt.Add(reference.Name)) continue;
+
+            module.Assembly.CustomAttributes.Add(new CustomAttribute(ctor) {
+                ConstructorArguments = { new CustomAttributeArgument(module.TypeSystem.String, reference.Name) }
+            });
+        }
+    }
+
+    private static TypeDefinition InjectAttributeType(ModuleDefinition module) {
         var attributeType = new TypeDefinition("System.Runtime.CompilerServices",
-            "IgnoresAccessChecksToAttribute",
+            nameof(System.Runtime.CompilerServices.IgnoresAccessChecksToAttribute),
             TypeAttributes.NotPublic | TypeAttributes.Sealed | TypeAttributes.BeforeFieldInit,
             module.ImportReference(typeof(Attribute)));
         module.Types.Add(attributeType);
-
-        var usage = new CustomAttribute(module.ImportReference(
-            typeof(AttributeUsageAttribute).GetConstructor([typeof(AttributeTargets)])!));
-        usage.ConstructorArguments.Add(new CustomAttributeArgument(
-            module.ImportReference(typeof(AttributeTargets)), (int)AttributeTargets.Assembly));
-        usage.Properties.Add(new CustomAttributeNamedArgument(nameof(AttributeUsageAttribute.AllowMultiple),
-            new CustomAttributeArgument(module.TypeSystem.Boolean, true)));
-        attributeType.CustomAttributes.Add(usage);
 
         var nameField = new FieldDefinition("AssemblyName", FieldAttributes.Private | FieldAttributes.InitOnly,
             module.TypeSystem.String);
@@ -171,12 +181,20 @@ internal static class AssemblyInjection {
         property.GetMethod = getter;
         attributeType.Properties.Add(property);
 
-        // Everything the patched assembly can reference, including the game's own framework assemblies.
-        foreach (var reference in module.AssemblyReferences) {
-            module.Assembly.CustomAttributes.Add(new CustomAttribute(ctor) {
-                ConstructorArguments = { new CustomAttributeArgument(module.TypeSystem.String, reference.Name) }
-            });
+        return attributeType;
+    }
+
+    // Mods that publicize their references already carry exemptions of their own.
+    private static HashSet<string> ExemptedAssemblyNames(ModuleDefinition module, MethodReference ctor) {
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var attribute in module.Assembly.CustomAttributes) {
+            if (attribute.AttributeType.FullName != AttributeTypeName) continue;
+            if (attribute.Constructor.Resolve() != ctor) continue;
+            if (attribute.ConstructorArguments.FirstOrDefault().Value is string name) names.Add(name);
         }
+
+        return names;
     }
 
     private static void CallFromModuleInitializer(ModuleDefinition module, MethodDefinition method) {
