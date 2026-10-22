@@ -20,7 +20,7 @@ internal static class PatchInstaller {
         Validate(main.Bytes!);
 
         PatchState.WriteAtomic(state.PatchedAssemblyPath(fingerprint), main.Bytes!);
-        PatchState.WriteAtomic(state.InstalledAssemblyPath, main.Bytes!);
+        GameAssemblyInstaller.Install(state.InstalledAssemblyPath, main.Bytes!);
     }
 
     private static void Validate(byte[] bytes) {

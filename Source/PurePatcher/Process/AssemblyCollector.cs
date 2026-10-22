@@ -11,6 +11,7 @@ internal static class AssemblyCollector {
     // 1.7 is self-contained: the runtime and game assemblies live next to the executable.
     internal static IEnumerable<(string, string)> SystemAssemblyPaths() => Directory
         .GetFiles(AppContext.BaseDirectory, "*.dll")
+        .Where(ManagedAssemblyFiles.IsAssembly)
         .Select(asmPath => ($"(System) {Path.GetFileName(asmPath)}", asmPath));
 
     internal static AssemblySet Collect(PatchState state) {

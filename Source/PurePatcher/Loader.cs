@@ -7,6 +7,7 @@ namespace PurePatcher;
 internal static class Loader {
     internal static void Reload(string packageId) {
         var state = new PatchState();
+        GameAssemblyInstaller.CleanupPrevious(state.InstalledAssemblyPath);
         state.SyncVanillaBaseline();
 
         var fingerprint = PatchFingerprint.Compute(state);
